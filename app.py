@@ -186,8 +186,6 @@ with st.spinner("Memproses data..."):
 
         # Display the DataFrame
         st.subheader("Tabel")
-        # sort the DataFrame by date in descending order
-        df_filtered = df_filtered.sort_values(by='date', ascending=False)
 
         # Perform calculations before formatting
         df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
@@ -210,6 +208,12 @@ with st.spinner("Memproses data..."):
             'difference': 'Selisih'
         }, inplace=True)
 
+        # reorder columns
+        df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih']]
+
+        # sort by date
+        df_filtered = df_filtered.sort_values(by='Tanggal', ascending=False)
+        
         # Display the formatted DataFrame
         st.dataframe(df_filtered, use_container_width=True, hide_index=True)
         st.markdown(
