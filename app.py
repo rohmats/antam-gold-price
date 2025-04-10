@@ -143,7 +143,7 @@ with st.spinner("Memproses data..."):
                 x=0.5,  # Center the title
                 xanchor='center'
             ),
-            xaxis_title='Date',
+            xaxis_title='Tanggal',
             yaxis_title='Harga',
             xaxis=dict(
                 showgrid=False  # Remove grid for x-axis
@@ -152,7 +152,8 @@ with st.spinner("Memproses data..."):
                 tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
                 separatethousands=True,  # Add thousand separators
                 tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
-                showgrid=False  # Remove grid for y-axis
+                showgrid=False,  # Remove grid for y-axis
+                showticklabels=False  # Hide y-axis tick labels
             ),
             yaxis2=dict(
                 title='Selisih',
@@ -161,7 +162,8 @@ with st.spinner("Memproses data..."):
                 tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
                 separatethousands=True,  # Add thousand separators
                 tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
-                showgrid=False  # Remove grid for secondary y-axis
+                showgrid=False,  # Remove grid for secondary y-axis
+                showticklabels=False  # Hide secondary y-axis tick labels
             ),
             legend=dict(
                 orientation="h",  # Horizontal legend
