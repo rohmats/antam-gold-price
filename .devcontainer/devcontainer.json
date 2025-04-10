@@ -1,7 +1,8 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/python-3
 {
-	"image": "mcr.microsoft.com/devcontainers/python:0-3.11-bullseye",
+	"name": "Antam Gold Price",
+	"image": "mcr.microsoft.com/devcontainers/python:3.9", // Use a Python 3.9 image
 	"customizations": {
 		"codespaces": {
 			"openFiles": [
@@ -12,7 +13,8 @@
 			"settings": {},
 			"extensions": [
 				"ms-python.python",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"streetsidesoftware.code-spell-checker"
 			]
 		}
 	},
@@ -22,7 +24,7 @@
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// Install app dependencies.
-	"postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "pip install -r requirements.txt",
 	// Use 'postAttachCommand' to run commands after a tool has attached to the container.
 	// Start the app.
 	"postAttachCommand": {
@@ -37,9 +39,8 @@
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
 	"features": {
-		// Optional features for development - increase container boot time!
-		// "ghcr.io/devcontainers-contrib/features/coverage-py:2": {},
-		// "git": "latest",
-		// "github-cli": "latest"
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.9"
+		}
 	}
 }
