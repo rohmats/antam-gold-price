@@ -220,6 +220,6 @@ with st.spinner("Memproses data..."):
         )
         # Display error message if API call fails
         if e:
-            st.error(f"Terjadi kesalahan saat mengambil data dari API: {e}")
+            st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
         else:
             st.success("Data berhasil diambil dari API.")
