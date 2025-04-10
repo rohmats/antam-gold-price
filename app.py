@@ -199,6 +199,10 @@ with st.spinner("Memproses data..."):
         df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
 
+        # Sort DataFrame by date
+        df_filtered.sort_values(by='date', ascending=False, inplace=True)
+        
+        # Rename columns for display
         df_filtered.rename(columns={
             'date': 'Tanggal',
             'amount_sell': 'Harga Jual',
@@ -211,9 +215,6 @@ with st.spinner("Memproses data..."):
         # reorder columns
         df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih']]
 
-        # sort by date
-        df_filtered = df_filtered.sort_values(by='Tanggal', ascending=False)
-        
         # Display the formatted DataFrame
         st.dataframe(df_filtered, use_container_width=True, hide_index=True)
         st.markdown(
