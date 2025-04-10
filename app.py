@@ -86,7 +86,7 @@ df_combined = df_combined[df_combined['date'] >= pd.to_datetime('2024-01-01').da
 df_combined = df_combined.drop_duplicates(subset=['date'], keep='last')
 
 # Streamlit app
-st.title("Visualisasi Harga Jual, Beli, dan Selisih Emas Antam")
+st.title("Harga Emas Antam")
 
 # Sidebar for user input
 st.sidebar.title("Pengaturan")
@@ -138,7 +138,7 @@ with st.spinner("Memproses data..."):
         # Update layout
         fig.update_layout(
             title=dict(
-                text='Harga Jual dan Beli Emas Antam',
+                text="Harga Jual, Beli, dan Selisih Emas Antam",
                 font=dict(size=24),  # Increase font size
                 x=0.5,  # Center the title
                 xanchor='center'
