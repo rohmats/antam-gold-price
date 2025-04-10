@@ -11,7 +11,7 @@ st.set_page_config(
     page_title="Harga Emas Antam",
     page_icon=":bar_chart:",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"  # Change from "expanded" to "collapsed"
 )
 
 # Set Plotly dark theme
