@@ -190,6 +190,9 @@ with st.spinner("Memproses data..."):
         # Perform calculations before formatting
         df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
         df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
+        
+        # Sort DataFrame by date
+        df_filtered.sort_values(by='date', ascending=False, inplace=True)
 
         # Format date as Indonesian and values as Rupiah
         df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
@@ -198,9 +201,6 @@ with st.spinner("Memproses data..."):
         df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
-
-        # Sort DataFrame by date
-        df_filtered.sort_values(by='date', ascending=False, inplace=True)
         
         # Rename columns for display
         df_filtered.rename(columns={
