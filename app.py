@@ -31,6 +31,19 @@ def process_json_to_dataframe(data):
 sell = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell").json()
 buy = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy").json()
 
+# if response valid save to json, if not print error and process from local
+if sell and buy:
+    with open('sell.json', 'w') as f:
+        json.dump(sell, f)
+    with open('buy.json', 'w') as f:
+        json.dump(buy, f)
+else:
+    print("Error fetching data from API")
+    with open('sell.json', 'r') as f:
+        sell = json.load(f)
+    with open('buy.json', 'r') as f:
+        buy = json.load(f)
+
 # Process data into DataFrames
 df_sell = process_json_to_dataframe(sell)
 df_buy = process_json_to_dataframe(buy)
