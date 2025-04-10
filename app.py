@@ -113,7 +113,7 @@ with st.spinner("Memproses data..."):
             name='Jual',
             fill='tozeroy',  # Fill to the x-axis
             line=dict(color='#FF4136'),  # Set line color to red
-            hovertemplate='%{y:,.0f}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
+            hovertemplate='%{y:,}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
         ))
 
         # Add area chart for "Buy" (green)
@@ -124,7 +124,7 @@ with st.spinner("Memproses data..."):
             name='Beli',
             fill='tozeroy',  # Fill to the x-axis
             line=dict(color='#2ECC40'),  # Set line color to green
-            hovertemplate='%{y:,.0f}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
+            hovertemplate='%{y:,}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
         ))
 
         # Add line chart for "Difference" (blue) on the right y-axis
@@ -135,7 +135,7 @@ with st.spinner("Memproses data..."):
             name='Selisih',
             line=dict(color='#0074D9'),  # Set line color to blue
             yaxis='y2',
-            hovertemplate='%{y:,.0f}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
+            hovertemplate='%{y:,}'.replace(',', '.') + '<extra></extra>'  # Format hover with . as thousand separator
         ))
 
         # Update layout
