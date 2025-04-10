@@ -146,7 +146,8 @@ with st.spinner("Memproses data..."):
             xaxis_title='Tanggal',
             yaxis_title='Harga',
             xaxis=dict(
-                showgrid=False  # Remove grid for x-axis
+                showgrid=False,  # Remove grid for x-axis
+                range=[df_filtered['date'].iloc[-10], df_filtered['date'].iloc[-1]]  # Focus on the last 10 data points
             ),
             yaxis=dict(
                 tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
@@ -172,6 +173,15 @@ with st.spinner("Memproses data..."):
                 xanchor='center'
             ),
             hovermode="x"  # Show all y values for the same x value
+        )
+
+        # Set hover to the last data point
+        fig.add_annotation(
+            x=df_filtered['date'].iloc[-1],
+            y=df_filtered['amount_sell'].iloc[-1],
+            text="Last Data",
+            showarrow=True,
+            arrowhead=1
         )
 
         # Display the chart
