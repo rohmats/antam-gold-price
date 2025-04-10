@@ -3,6 +3,16 @@ import pandas as pd
 import requests
 from plotly import graph_objects as go
 from plotly import io as pio
+import json
+from datetime import date
+
+# Set page configuration
+st.set_page_config(
+    page_title="Harga Emas Antam",
+    page_icon=":bar_chart:",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # Set Plotly dark theme
 pio.templates.default = "plotly_dark"
@@ -28,21 +38,30 @@ def process_json_to_dataframe(data):
     return df
 
 # Fetch data from APIs
-sell = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell").json()
-buy = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy").json()
+e = None  # Initialize 'e' to ensure it is defined
+try:
+    sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
+    buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy")
+    sell_response.raise_for_status()
+    buy_response.raise_for_status()
+    sell = sell_response.json()
+    buy = buy_response.json()
 
-# if response valid save to json, if not print error and process from local
-if sell and buy:
-    with open('sell.json', 'w') as f:
+    # Save to local JSON files
+    with open('antam_sell.json', 'w', encoding='utf-8') as f:
         json.dump(sell, f)
-    with open('buy.json', 'w') as f:
+    with open('antam_buy.json', 'w', encoding='utf-8') as f:
         json.dump(buy, f)
-else:
-    print("Error fetching data from API")
-    with open('sell.json', 'r') as f:
-        sell = json.load(f)
-    with open('buy.json', 'r') as f:
-        buy = json.load(f)
+except (requests.RequestException, json.JSONDecodeError) as error:
+    e = error  # Assign the error to 'e'
+    try:
+        with open('antam_sell.json', 'r', encoding='utf-8') as f:
+            sell = json.load(f)
+        with open('antam_buy.json', 'r', encoding='utf-8') as f:
+            buy = json.load(f)
+    except FileNotFoundError:
+        st.error("Local data files not found. Exiting.")
+        st.stop()
 
 # Process data into DataFrames
 df_sell = process_json_to_dataframe(sell)
@@ -67,82 +86,140 @@ df_combined = df_combined[df_combined['date'] >= pd.to_datetime('2024-01-01').da
 df_combined = df_combined.drop_duplicates(subset=['date'], keep='last')
 
 # Streamlit app
-st.title("Harga Jual dan Beli Emas Antam")
-st.write("Visualisasi harga jual, beli, dan selisih emas Antam.")
+st.title("Visualisasi Harga Jual, Beli, dan Selisih Emas Antam")
 
-# Plotly chart
-fig = go.Figure()
+# Sidebar for user input
+st.sidebar.title("Pengaturan")
+st.sidebar.markdown("Pilih rentang tanggal untuk menampilkan data.")
+start_date = st.sidebar.date_input("Tanggal Mulai", value=date.today().replace(year=date.today().year - 1))
+end_date = st.sidebar.date_input("Tanggal Akhir", value=date.today())
+if start_date > end_date:
+    st.sidebar.error("Tanggal mulai harus lebih awal dari tanggal akhir.")
 
-# Add area chart for "Sell" (red)
-fig.add_trace(go.Scatter(
-    x=df_combined['date'], 
-    y=df_combined['amount_sell'], 
-    mode='lines', 
-    name='Jual',
-    fill='tozeroy',  # Fill to the x-axis
-    line=dict(color='#FF4136')  # Set line color to red
-))
+# Filter DataFrame based on user input
+with st.spinner("Memproses data..."):
+    df_filtered = df_combined[(df_combined['date'] >= start_date) & (df_combined['date'] <= end_date)]
+    if df_filtered.empty:
+        st.warning("Tidak ada data untuk rentang tanggal yang dipilih.")
+    else:
+        # Plotly chart
+        fig = go.Figure()
 
-# Add area chart for "Buy" (green)
-fig.add_trace(go.Scatter(
-    x=df_combined['date'], 
-    y=df_combined['amount_buy'], 
-    mode='lines', 
-    name='Beli',
-    fill='tozeroy',  # Fill to the x-axis
-    line=dict(color='#2ECC40')  # Set line color to green
-))
+        # Add area chart for "Sell" (red)
+        fig.add_trace(go.Scatter(
+            x=df_filtered['date'], 
+            y=df_filtered['amount_sell'], 
+            mode='lines', 
+            name='Jual',
+            fill='tozeroy',  # Fill to the x-axis
+            line=dict(color='#FF4136')  # Set line color to red
+        ))
 
-# Add line chart for "Difference" (blue) on the right y-axis
-fig.add_trace(go.Scatter(
-    x=df_combined['date'], 
-    y=df_combined['difference'], 
-    mode='lines', 
-    name='Selisih',
-    line=dict(color='#0074D9'),  # Set line color to blue
-    yaxis='y2'
-))
+        # Add area chart for "Buy" (green)
+        fig.add_trace(go.Scatter(
+            x=df_filtered['date'], 
+            y=df_filtered['amount_buy'], 
+            mode='lines', 
+            name='Beli',
+            fill='tozeroy',  # Fill to the x-axis
+            line=dict(color='#2ECC40')  # Set line color to green
+        ))
 
-# Update layout
-fig.update_layout(
-    title=dict(
-        text='Harga Jual dan Beli Emas Antam',
-        font=dict(size=24),  # Increase font size
-        x=0.5,  # Center the title
-        xanchor='center'
-    ),
-    xaxis_title='Date',
-    yaxis_title='Harga',
-    xaxis=dict(
-        showgrid=False  # Remove grid for x-axis
-    ),
-    yaxis=dict(
-        tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
-        separatethousands=True,  # Add thousand separators
-        tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
-        showgrid=False  # Remove grid for y-axis
-    ),
-    yaxis2=dict(
-        title='Selisih',
-        overlaying='y',  # Overlay on the same plot
-        side='right',    # Place on the right side
-        tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
-        separatethousands=True,  # Add thousand separators
-        tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
-        showgrid=False  # Remove grid for secondary y-axis
-    ),
-    legend=dict(
-        orientation="h",  # Horizontal legend
-        x=0.5, 
-        y=-0.2,  # Position below the chart
-        xanchor='center'
-    ),
-    hovermode="x"  # Show all y values for the same x value
-)
+        # Add line chart for "Difference" (blue) on the right y-axis
+        fig.add_trace(go.Scatter(
+            x=df_filtered['date'], 
+            y=df_filtered['difference'], 
+            mode='lines', 
+            name='Selisih',
+            line=dict(color='#0074D9'),  # Set line color to blue
+            yaxis='y2'
+        ))
 
-# Display the chart
-st.plotly_chart(fig, use_container_width=True)
+        # Update layout
+        fig.update_layout(
+            title=dict(
+                text='Harga Jual dan Beli Emas Antam',
+                font=dict(size=24),  # Increase font size
+                x=0.5,  # Center the title
+                xanchor='center'
+            ),
+            xaxis_title='Date',
+            yaxis_title='Harga',
+            xaxis=dict(
+                showgrid=False  # Remove grid for x-axis
+            ),
+            yaxis=dict(
+                tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
+                separatethousands=True,  # Add thousand separators
+                tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
+                showgrid=False  # Remove grid for y-axis
+            ),
+            yaxis2=dict(
+                title='Selisih',
+                overlaying='y',  # Overlay on the same plot
+                side='right',    # Place on the right side
+                tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
+                separatethousands=True,  # Add thousand separators
+                tickformat=',.0f',  # Disable abbreviation (e.g., M, K)
+                showgrid=False  # Remove grid for secondary y-axis
+            ),
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                x=0.5, 
+                y=-0.2,  # Position below the chart
+                xanchor='center'
+            ),
+            hovermode="x"  # Show all y values for the same x value
+        )
 
-# Display the DataFrame
-st.subheader("Tabel")
-st.dataframe(df_combined)
+        # Display the chart
+        st.subheader("Grafik")
+        # Set the height of the chart in the layout
+        fig.update_layout(height=800)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+        # Display the DataFrame
+        st.subheader("Tabel")
+        # sort the DataFrame by date in descending order
+        df_filtered = df_filtered.sort_values(by='date', ascending=False)
+
+        # Format date as Indonesian and values as Rupiah
+        df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
+        df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        df_filtered.rename(columns={
+            'date': 'Tanggal',
+            'amount_sell': 'Harga Jual',
+            'amount_buy': 'Harga Beli',
+            'difference': 'Selisih'
+        }, inplace=True)
+
+        # Display the formatted DataFrame
+        st.dataframe(df_filtered, use_container_width=True, hide_index=True)
+        
+        st.subheader("Catatan")
+        # Display which data is used, last updated date, and data source in one sentence
+        st.markdown(
+            f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}."
+        )
+        # Display notes on data fetching
+        st.markdown(
+            """
+            - Data diambil dari API dan disimpan secara lokal.
+            - Jika API tidak dapat diakses, data lokal akan digunakan.
+            - Data ditampilkan dalam format tabel dan grafik.
+            """
+        )
+
+        st.subheader("Status API")
+        st.markdown(
+            """
+            - API menggunakan [logam-mulia API](https://logam-mulia.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
+            """
+        )
+        # Display error message if API call fails
+        if e:
+            st.error(f"Terjadi kesalahan saat mengambil data dari API: {e}")
+        else:
+            st.success("Data berhasil diambil dari API.")
