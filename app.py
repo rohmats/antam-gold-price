@@ -197,6 +197,16 @@ with st.spinner("Memproses data..."):
 
         # Display the formatted DataFrame
         st.dataframe(df_filtered, use_container_width=True, hide_index=True)
+        st.markdown(
+                """
+                <style>
+                [data-testid="stElementToolbar"] {
+                    display: none;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
         
         st.subheader("Catatan")
         # Display which data is used, last updated date, and data source in one sentence
