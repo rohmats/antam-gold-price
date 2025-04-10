@@ -146,7 +146,8 @@ with st.spinner("Memproses data..."):
             xaxis_title='Tanggal',
             yaxis_title='Harga',
             xaxis=dict(
-                showgrid=False  # Remove grid for x-axis
+                showgrid=False,  # Remove grid for x-axis
+                tickformat='%d %b %Y'  # Format x-axis as dd MMM yyyy
             ),
             yaxis=dict(
                 tickprefix='Rp ',  # Add "Rp " prefix for Indonesian Rupiah
