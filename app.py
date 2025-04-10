@@ -189,17 +189,18 @@ with st.spinner("Memproses data..."):
         # sort the DataFrame by date in descending order
         df_filtered = df_filtered.sort_values(by='date', ascending=False)
 
+        # Perform calculations before formatting
+        df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
+        df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
+
         # Format date as Indonesian and values as Rupiah
         df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
         df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
-        # add amount_sell changes column from previous day
-        df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
         df_filtered['amount_sell_change'] = df_filtered['amount_sell_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
-        # add amount_buy changes column from previous day
-        df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
         df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+
         df_filtered.rename(columns={
             'date': 'Tanggal',
             'amount_sell': 'Harga Jual',
