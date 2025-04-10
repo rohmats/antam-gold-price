@@ -192,12 +192,20 @@ with st.spinner("Memproses data..."):
         # Format date as Indonesian and values as Rupiah
         df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
         df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        # add amount_sell changes column from previous day
+        df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
+        df_filtered['amount_sell_change'] = df_filtered['amount_sell_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        # add amount_buy changes column from previous day
+        df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
+        df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
         df_filtered.rename(columns={
             'date': 'Tanggal',
             'amount_sell': 'Harga Jual',
             'amount_buy': 'Harga Beli',
+            'amount_sell_change': 'Perubahan Jual',
+            'amount_buy_change': 'Perubahan Beli',
             'difference': 'Selisih'
         }, inplace=True)
 
