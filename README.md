@@ -1,1 +1,1 @@
-# antam-gold-price
+# Visualisasi harga jual, beli, dan selisih emas Antam.
