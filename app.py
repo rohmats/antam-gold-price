@@ -139,13 +139,13 @@ else:
     df_filtered.sort_values(by='date', ascending=False, inplace=True)
 
     # Calculate changes and format without suffix
-    df_filtered['↕ Jual'] = df_filtered['amount_sell_change'].apply(
+    df_filtered['Perubahan Jual'] = df_filtered['amount_sell_change'].apply(
         lambda x: f"{int(x):,}".replace(',', '.')
     )
-    df_filtered['↕ Beli'] = df_filtered['amount_buy_change'].apply(
+    df_filtered['Perubahan Beli'] = df_filtered['amount_buy_change'].apply(
         lambda x: f"{int(x):,}".replace(',', '.')
     )
-    df_filtered['↕ Selisih'] = df_filtered['amount_selisih_change'].apply(
+    df_filtered['Perubahan Selisih'] = df_filtered['amount_selisih_change'].apply(
         lambda x: f"{int(x):,}".replace(',', '.')
     )
 
@@ -164,7 +164,7 @@ else:
     }, inplace=True)
 
     # Reorder columns (ensure no duplicates)
-    df_filtered = df_filtered[['Tanggal', 'Harga Jual', '↕ Jual', 'Harga Beli', '↕ Beli', 'Selisih', '↕ Selisih']]
+    df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih', 'Perubahan Selisih']]
 
     # Convert the DataFrame to HTML with right-aligned columns
     df_html = df_filtered.to_html(index=False, justify='right', classes='right-align-table')
