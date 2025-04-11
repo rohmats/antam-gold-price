@@ -184,20 +184,6 @@ with tab1:
 
 
 # Tab 2: Simulasi Buyback
-# Create simulasi buyback using streamlit data editor.
-# User only needs to input the amount of gold and buy date.
-# The rest of the columns will be calculated automatically.
-# Let user input the amount of gold and buy date directly to the table
-# Get buy price from the df_combined based on the date
-# Get todays buyback price from the df_combined
-# Calculate profit/loss based on the buy price and todays buyback price
-# Use st.data_editor to create a table with the following columns:
-# - Jumlah Emas (gram)
-# - Tanggal Beli
-# - Harga Beli (Rp)
-# - Harga Jual (Rp)
-# - Selisih (Rp)
-# - Keuntungan/Rugi (Rp)
 with tab2:
     st.title("Simulasi Buyback")
     st.markdown("Gunakan tabel di bawah ini untuk menghitung estimasi keuntungan/rugi dari buyback emas Anda.")
@@ -261,8 +247,18 @@ if st.session_state.buyback_results:
     st.subheader("Hasil Simulasi")
     result_data = pd.DataFrame(st.session_state.buyback_results)
     result_data.index += 1  # Increment the index for display
+
+    # Format numerical columns
+    result_data['Jumlah Emas (gram)'] = result_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
+    result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+    result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+    result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+    result_data['Selisih per Gram (Rp)'] = result_data['Selisih per Gram (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+    result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+
+    # Display the formatted table
     st.dataframe(result_data, use_container_width=True)
-    st.info(f"Total Keuntungan/Rugi: **Rp {result_data['Keuntungan/Rugi (Rp)'].sum():,.0f}**")
+    st.info(f"Total Keuntungan/Rugi: **Rp {result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum():,.0f}**")
 
     # Add a reset button
     if st.button("Reset Data"):
