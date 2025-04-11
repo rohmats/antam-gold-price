@@ -25,7 +25,7 @@ def process_json_to_dataframe(data):
     df.rename(columns={df.columns[0]: "date", df.columns[1]: "amount"}, inplace=True)
     if df['date'].max() > 10**10:  # Convert milliseconds to seconds if needed
         df['date'] = df['date'] // 1000
-    df['date'] = pd.to_datetime(df['date'], unit='s')
+    df['date'] = pd.to_datetime(df['date'], unit='s').dt.date
     df['amount'] = pd.to_numeric(df['amount'])
     return df
 
@@ -61,18 +61,15 @@ df_sell = process_json_to_dataframe(sell)
 df_buy = process_json_to_dataframe(buy)
 
 # Combine and preprocess data
-df_combined = pd.merge(df_sell, df_buy, on='date', how='outer', suffixes=('_sell', '_buy')).fillna(0)
-df_combined['date'] = df_combined['date'].dt.date
+df_combined = pd.merge(df_sell, df_buy, on='date', how='outer', suffixes=('_sell', '_buy'))
+df_combined['date'] = df_combined['date']
 df_combined['difference'] = df_combined['amount_sell'] - df_combined['amount_buy']
-df_combined = df_combined[df_combined['date'] >= pd.to_datetime('2024-01-01').date()]
 df_combined = df_combined.drop_duplicates(subset=['date'], keep='last')
 
 # Streamlit app
 st.title("Harga Emas Antam")
-st.markdown("### Pilih Rentang Tanggal")
-
 # Dropdown for relative date options
-relative_date_options = ["7 Hari Terakhir", "30 Hari Terakhir", "6 Bulan Terakhir", "1 Tahun Terakhir", "Custom"]
+relative_date_options = ["7 Hari Terakhir", "30 Hari Terakhir", "6 Bulan Terakhir", "1 Tahun Terakhir", "Tampilkan Semua"]
 selected_option = st.selectbox("Pilih Rentang Waktu", relative_date_options, index=3)
 
 # Determine start and end dates
@@ -84,21 +81,15 @@ elif selected_option == "6 Bulan Terakhir":
     start_date, end_date = date.today() - timedelta(days=6 * 30), date.today()
 elif selected_option == "1 Tahun Terakhir":
     start_date, end_date = date.today().replace(year=date.today().year - 1), date.today()
-else:
-    col1, col2 = st.columns(2)
-    with col1:
-        start_date = st.date_input("Tanggal Mulai", value=date.today().replace(year=date.today().year - 1))
-    with col2:
-        end_date = st.date_input("Tanggal Akhir", value=date.today())
-    if start_date > end_date:
-        st.error("Tanggal mulai harus lebih awal dari tanggal akhir.")
+elif selected_option == "Tampilkan Semua":
+    start_date, end_date = df_combined['date'].min(), df_combined['date'].max()
 
 # Filter data
 df_filtered = df_combined[(df_combined['date'] >= start_date) & (df_combined['date'] <= end_date)]
-if df_filtered.empty:
-    st.warning("Tidak ada data untuk rentang tanggal yang dipilih.")
-else:
-    # Plotly chart
+
+
+# Plotly chart
+if not df_filtered.empty:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['amount_sell'], mode='lines', name='Jual',
                              fill='tozeroy', line=dict(color='#FF4136'), hovertemplate='%{y:,.0f}<extra></extra>'))
@@ -125,102 +116,54 @@ else:
             side='right',
             separatethousands=True
         ),
-        legend=dict(orientation="h", x=0.5, y=1, xanchor='center', yanchor='top'),
+        legend=dict(orientation="h", x=0.5, y=1.1, xanchor='center', yanchor='top'),
         hovermode="x",
-        height=800
+        height=600
     )
     st.subheader("Grafik")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    # Format and display table
-    df_filtered['amount_sell_change'] = df_filtered['amount_sell'].diff().fillna(0)
-    df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
-    df_filtered['amount_selisih_change'] = df_filtered['difference'].diff().fillna(0)
-    df_filtered.sort_values(by='date', ascending=False, inplace=True)
+# copy data for display dataframe
+df_filtered = df_filtered.copy()
 
-    # Calculate changes and format without suffix
-    df_filtered['Perubahan Jual'] = df_filtered['amount_sell_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.')
-    )
-    df_filtered['Perubahan Beli'] = df_filtered['amount_buy_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.')
-    )
-    df_filtered['Perubahan Spread'] = df_filtered['amount_selisih_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.')
-    )
+# order by date descending
+df_filtered = df_filtered.sort_values(by='date', ascending=False)
 
-    # Format other columns as strings
-    df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %b %Y'))  # Format Tanggal as dd MMM YYYY
-    df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
-    df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
-    df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+# Format date for display
+df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
+# Format amount columns
+df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}")
+df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}")
+df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}" if x >= 0 else f"Rp {abs(x):,.0f} (Rugi)")
+# Format difference column
+df_filtered['difference'] = df_filtered['difference'].apply(lambda x: x.replace("Rp ", "Rp -") if "Rugi" in x else x)
 
-    # Rename columns for display (ensure no duplicates)
-    df_filtered.rename(columns={
-        'date': 'Tanggal', 
-        'amount_sell': 'Harga Jual', 
-        'amount_buy': 'Harga Beli',
-        'difference': 'Spread'
-    }, inplace=True)
+# rename columns for display
+df_filtered.rename(columns={
+    'date': 'Tanggal',
+    'amount_sell': 'Harga Jual',
+    'amount_buy': 'Harga Beli',
+    'difference': 'Spread'
+}, inplace=True)
 
-    # Reorder columns (ensure no duplicates)
-    df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']]
+# display dataframe
+st.subheader("Data Tabel")
+st.dataframe(df_filtered, use_container_width=True, hide_index=True)
 
-    # Convert the DataFrame to HTML with right-aligned columns
-    df_html = df_filtered.to_html(index=False, justify='right', classes='right-align-table')
 
-    # Add custom CSS for right alignment, scrollable table, and full-width table
-    st.markdown(
-        """
-        <style>
-        .right-align-table th {
-            text-align: center !important; /* Center align headers */
-            position: sticky; /* Freeze header */
-            top: 0;
-            z-index: 2; /* Ensure header is above other elements */
-            background-color: #1e1e1e; /* Match dark theme background */
-            color: #ffffff; /* White text for contrast */
-            left: 2; /* Align header with first column */
-            font-style: bold; /* Bold header text */
-        }
-        .right-align-table td {
-            text-align: right !important; /* Default alignment for other columns */
-        }
-        .right-align-table td:first-child, .right-align-table th:first-child {
-            text-align: center !important; /* Center align the "Tanggal" column */
-            background-color: #1e1e1e; /* Match dark theme background */
-            color: #ffffff; /* White text for contrast */
-        }
-        .scrollable-table {
-            max-height: 400px; /* Set the desired height */
-            overflow-y: auto;
-            border: 1px solid #ddd;
-        }
-        .scrollable-table table {
-            width: 100%; /* Make the table width fit the container */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Wrap the table in a scrollable div
-    st.subheader("Tabel")
-    st.markdown(f'<div class="scrollable-table">{df_html}</div>', unsafe_allow_html=True)
-
-    # Notes and API status
-    st.subheader("Catatan")
-    st.markdown(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
-    st.markdown("""
-    - Data diambil dari API dan disimpan secara lokal.
-    - Jika API tidak dapat diakses, data lokal akan digunakan.
-    - Data ditampilkan dalam format tabel dan grafik.
-    """)
-    st.subheader("Status API")
-    st.markdown("""
-    - API menggunakan [logam-mulia API](https://logam-mulia.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
-    """)
-    if e:
-        st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
-    else:
-        st.success("Data berhasil diambil dari API.")
+# Notes and API status
+st.subheader("Catatan")
+st.markdown(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
+st.markdown("""
+- Data diambil dari API dan disimpan secara lokal.
+- Jika API tidak dapat diakses, data lokal akan digunakan.
+- Data ditampilkan dalam format tabel dan grafik.
+""")
+st.subheader("Status API")
+st.markdown("""
+- API menggunakan [logam-mulia API](https://logam-mulia.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
+""")
+if e:
+    st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
+else:
+    st.success("Data berhasil diambil dari API.")
