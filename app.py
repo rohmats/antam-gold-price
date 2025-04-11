@@ -161,10 +161,10 @@ else:
     # Reorder columns
     df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih', 'Perubahan Selisih']]
 
-    st.subheader("Tabel")
+    # Configure AgGrid options
     grid_options = GridOptionsBuilder.from_dataframe(df_filtered)
 
-    # Configure default column settings
+    # Set default column properties
     grid_options.configure_default_column(
         filterable=True, 
         sortable=True, 
@@ -173,24 +173,22 @@ else:
     )
 
     # Configure specific columns
-    grid_options.configure_column("Tanggal", pinned="left", cellStyle={"textAlign": "center"})  # Center-align and freeze 'Tanggal'
+    grid_options.configure_column("Tanggal", pinned="left", cellStyle={"textAlign": "center"})  # Freeze and center-align 'Tanggal'
 
     # Enable pagination
     grid_options.configure_pagination(paginationPageSize=10)
 
-    # Enable horizontal scrolling for mobile devices
-    grid_options.configure_grid_options(domLayout='autoHeight')  # Adjust height automatically
-
     # Build grid options
     grid_options = grid_options.build()
 
-    # Display the table with responsive settings
+    # Display the table using AgGrid
+    st.subheader("Tabel")
     AgGrid(
         df_filtered,
         gridOptions=grid_options,
-        height=400,  # Set a fixed height for better usability
+        height=400,  # Set table height
         fit_columns_on_grid_load=True,  # Automatically adjust column widths
-        theme="streamlit"
+        theme="streamlit"  # Use Streamlit theme
     )
 
     # Notes and API status
