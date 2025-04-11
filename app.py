@@ -188,10 +188,6 @@ else:
         }
         .right-align-table td:first-child, .right-align-table th:first-child {
             text-align: center !important; /* Center align the "Tanggal" column */
-            position: sticky; /* Freeze first column */
-            left: 0;
-            top:2
-            z-index: 1; /* Ensure first column is above other elements */
             background-color: #1e1e1e; /* Match dark theme background */
             color: #ffffff; /* White text for contrast */
         }
