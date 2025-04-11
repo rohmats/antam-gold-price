@@ -138,61 +138,79 @@ else:
     df_filtered['amount_selisih_change'] = df_filtered['difference'].diff().fillna(0)
     df_filtered.sort_values(by='date', ascending=False, inplace=True)
 
-    # Format columns
+    # Calculate changes and add suffix (⬆️, ⬇️, ↔️) to the "↕️" columns without 'Rp'
+    df_filtered['↕️ Jual'] = df_filtered['amount_sell_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    )
+    df_filtered['↕️ Beli'] = df_filtered['amount_buy_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    )
+    df_filtered['↕️ Selisih'] = df_filtered['amount_selisih_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    )
+
+    # Format other columns as strings
     df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %b %Y'))  # Format Tanggal as dd MMM YYYY
     df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
     df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
     df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
-    df_filtered['amount_sell_change'] = df_filtered['amount_sell_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
-    df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
-    df_filtered['amount_selisih_change'] = df_filtered['amount_selisih_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
 
-    # Rename columns for display
+    # Rename columns for display (ensure no duplicates)
     df_filtered.rename(columns={
         'date': 'Tanggal', 
         'amount_sell': 'Harga Jual', 
         'amount_buy': 'Harga Beli',
-        'difference': 'Selisih', 
-        'amount_sell_change': 'Perubahan Jual',
-        'amount_buy_change': 'Perubahan Beli', 
-        'amount_selisih_change': 'Perubahan Selisih'
+        'difference': 'Selisih'
     }, inplace=True)
 
-    # Reorder columns
-    df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih', 'Perubahan Selisih']]
+    # Reorder columns (ensure no duplicates)
+    df_filtered = df_filtered[['Tanggal', 'Harga Jual', '↕️ Jual', 'Harga Beli', '↕️ Beli', 'Selisih', '↕️ Selisih']]
 
-    # Configure AgGrid options
-    grid_options = GridOptionsBuilder.from_dataframe(df_filtered)
+    # Convert the DataFrame to HTML with right-aligned columns
+    df_html = df_filtered.to_html(index=False, justify='right', classes='right-align-table')
 
-    # Set default column properties
-    grid_options.configure_default_column(
-        filterable=True, 
-        sortable=True, 
-        resizable=True, 
-        cellStyle={"textAlign": "right"}  # Align all columns to the right by default
+    # Add custom CSS for right alignment, scrollable table, and full-width table
+    st.markdown(
+        """
+        <style>
+        .right-align-table th {
+            text-align: center !important; /* Center align headers */
+            position: sticky; /* Freeze header */
+            top: 0;
+            z-index: 2; /* Ensure header is above other elements */
+            background-color: #1e1e1e; /* Match dark theme background */
+            color: #ffffff; /* White text for contrast */
+            left: 2; /* Align header with first column */
+            font-style: bold; /* Bold header text */
+        }
+        .right-align-table td {
+            text-align: right !important; /* Default alignment for other columns */
+        }
+        .right-align-table td:first-child, .right-align-table th:first-child {
+            text-align: center !important; /* Center align the "Tanggal" column */
+            position: sticky; /* Freeze first column */
+            left: 0;
+            top:2
+            z-index: 1; /* Ensure first column is above other elements */
+            background-color: #1e1e1e; /* Match dark theme background */
+            color: #ffffff; /* White text for contrast */
+        }
+        .scrollable-table {
+            max-height: 400px; /* Set the desired height */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .scrollable-table table {
+            width: 100%; /* Make the table width fit the container */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
     )
 
-    # Configure specific columns
-    grid_options.configure_column("Tanggal", pinned="left", cellStyle={"textAlign": "center"})  # Freeze and center-align 'Tanggal'
-
-    # Enable pagination
-    grid_options.configure_pagination(paginationPageSize=10)
-
-    # Enable horizontal scrolling
-    grid_options.configure_grid_options(domLayout='normal')  # Allows horizontal scrolling
-
-    # Build grid options
-    grid_options = grid_options.build()
-
-    # Display the table using AgGrid
+    # Wrap the table in a scrollable div
     st.subheader("Tabel")
-    AgGrid(
-        df_filtered,
-        gridOptions=grid_options,
-        height=400,  # Set table height
-        fit_columns_on_grid_load=False,  # Keep column widths as defined
-        theme="streamlit"  # Use Streamlit theme
-    )
+    st.markdown(f'<div class="scrollable-table">{df_html}</div>', unsafe_allow_html=True)
 
     # Notes and API status
     st.subheader("Catatan")
