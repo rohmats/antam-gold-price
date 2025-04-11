@@ -138,15 +138,15 @@ else:
     df_filtered['amount_selisih_change'] = df_filtered['difference'].diff().fillna(0)
     df_filtered.sort_values(by='date', ascending=False, inplace=True)
 
-    # Calculate changes and add suffix (⬆️, ⬇️, ↔️) to the "↕️" columns without 'Rp'
-    df_filtered['↕️ Jual'] = df_filtered['amount_sell_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    # Calculate changes and format without suffix
+    df_filtered['↕ Jual'] = df_filtered['amount_sell_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.')
     )
-    df_filtered['↕️ Beli'] = df_filtered['amount_buy_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    df_filtered['↕ Beli'] = df_filtered['amount_buy_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.')
     )
-    df_filtered['↕️ Selisih'] = df_filtered['amount_selisih_change'].apply(
-        lambda x: f"{int(x):,}".replace(',', '.') + " ⬆️" if x > 0 else (f"{abs(int(x)):,}".replace(',', '.') + " ⬇️" if x < 0 else f"{int(x):,}".replace(',', '.') + " ↔️")
+    df_filtered['↕ Selisih'] = df_filtered['amount_selisih_change'].apply(
+        lambda x: f"{int(x):,}".replace(',', '.')
     )
 
     # Format other columns as strings
@@ -164,7 +164,7 @@ else:
     }, inplace=True)
 
     # Reorder columns (ensure no duplicates)
-    df_filtered = df_filtered[['Tanggal', 'Harga Jual', '↕️ Jual', 'Harga Beli', '↕️ Beli', 'Selisih', '↕️ Selisih']]
+    df_filtered = df_filtered[['Tanggal', 'Harga Jual', '↕ Jual', 'Harga Beli', '↕ Beli', 'Selisih', '↕ Selisih']]
 
     # Convert the DataFrame to HTML with right-aligned columns
     df_html = df_filtered.to_html(index=False, justify='right', classes='right-align-table')
