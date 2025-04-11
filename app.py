@@ -125,31 +125,41 @@ if not df_filtered.empty:
 # copy data for display dataframe
 df_filtered = df_filtered.copy()
 
-# Calculate price difference from previous day 
-
+# Calculate difference from previous day for each column
+df_filtered['amount_sell_diff'] = df_filtered['amount_sell'].diff().fillna(0)
+df_filtered['amount_buy_diff'] = df_filtered['amount_buy'].diff().fillna(0)
+df_filtered['difference_diff'] = df_filtered['difference'].diff().fillna(0)
 
 # order by date descending
 df_filtered = df_filtered.sort_values(by='date', ascending=False)
 
 # Format date for display
 df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
-# Format amount columns
-df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}")
-df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}")
-
+# Format columns
+df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{x:,.0f}")
+df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{x:,.0f}")
+df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{x:,.0f}")
+df_filtered['amount_sell_diff'] = df_filtered['amount_sell_diff'].apply(lambda x: f"{x:,.0f}")
+df_filtered['amount_buy_diff'] = df_filtered['amount_buy_diff'].apply(lambda x: f"{x:,.0f}")
+df_filtered['difference_diff'] = df_filtered['difference_diff'].apply(lambda x: f"{x:,.0f}")
 
 # rename columns for display
 df_filtered.rename(columns={
     'date': 'Tanggal',
     'amount_sell': 'Harga Jual',
     'amount_buy': 'Harga Beli',
-    'difference': 'Spread'
+    'difference': 'Spread',
+    'amount_sell_diff': 'Perubahan Jual',
+    'amount_buy_diff': 'Perubahan Beli',
+    'difference_diff': 'Perubahan Spread'
 }, inplace=True)
+
+# reorder columns for display
+df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']]
 
 # display dataframe
 st.subheader("Data Tabel")
 st.dataframe(df_filtered, use_container_width=True, hide_index=True)
-
 
 # Notes and API status
 st.subheader("Catatan")
