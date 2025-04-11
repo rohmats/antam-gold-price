@@ -211,13 +211,13 @@ with tab2:
         if tanggal_beli not in df_combined['date'].values:
             nearest_date = df_combined[df_combined['date'] < tanggal_beli]['date'].max()
             if nearest_date:
-                harga_beli_per_gram = df_combined.loc[df_combined['date'] == nearest_date, 'amount_buy'].values[0]
+                harga_beli_per_gram = df_combined.loc[df_combined['date'] == nearest_date, 'amount_sell'].values[0]
                 st.warning(f"Tanggal yang dipilih tidak tersedia. Menggunakan harga dari {nearest_date.strftime('%d %B %Y')}.")
             else:
                 st.error("Tanggal yang dipilih tidak tersedia dan tidak ada tanggal sebelumnya.")
                 st.stop()
         else:
-            harga_beli_per_gram = df_combined.loc[df_combined['date'] == tanggal_beli, 'amount_buy'].values[0]
+            harga_beli_per_gram = df_combined.loc[df_combined['date'] == tanggal_beli, 'amount_sell'].values[0]
             st.success(f"Harga beli per gram pada {tanggal_beli.strftime('%d %B %Y')}: **Rp {harga_beli_per_gram:,.0f}**")
             st.success(f"Total harga beli: **Rp {jumlah_emas * harga_beli_per_gram:,.0f}**")
         
@@ -225,7 +225,6 @@ with tab2:
         harga_beli_per_gram = float(harga_beli_per_gram)
         harga_beli_total = jumlah_emas * harga_beli_per_gram
         harga_jual_total = jumlah_emas * today_buyback_price
-        selisih_per_gram = today_buyback_price - harga_beli_per_gram
         keuntungan_rugi = harga_jual_total - harga_beli_total
 
         # Append the result to session state
@@ -235,7 +234,6 @@ with tab2:
             "Harga Beli per Gram (Rp)": harga_beli_per_gram,
             "Total Harga Beli (Rp)": harga_beli_total,
             "Total Harga Jual (Rp)": harga_jual_total,
-            "Selisih per Gram (Rp)": selisih_per_gram,
             "Keuntungan/Rugi (Rp)": keuntungan_rugi
         })
 
@@ -253,7 +251,6 @@ if st.session_state.buyback_results:
     result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
     result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
     result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
-    result_data['Selisih per Gram (Rp)'] = result_data['Selisih per Gram (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
     result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
 
     # Display the formatted table
