@@ -5,7 +5,6 @@ from plotly import graph_objects as go
 from plotly import io as pio
 import json
 from datetime import date, timedelta
-from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Set page configuration
 st.set_page_config(
@@ -126,6 +125,9 @@ if not df_filtered.empty:
 # copy data for display dataframe
 df_filtered = df_filtered.copy()
 
+# Calculate price difference from previous day 
+
+
 # order by date descending
 df_filtered = df_filtered.sort_values(by='date', ascending=False)
 
@@ -134,9 +136,7 @@ df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y')
 # Format amount columns
 df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"Rp {x:,.0f}")
 df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"Rp {x:,.0f}")
-df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"Rp {x:,.0f}" if x >= 0 else f"Rp {abs(x):,.0f} (Rugi)")
-# Format difference column
-df_filtered['difference'] = df_filtered['difference'].apply(lambda x: x.replace("Rp ", "Rp -") if "Rugi" in x else x)
+
 
 # rename columns for display
 df_filtered.rename(columns={
