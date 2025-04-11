@@ -161,7 +161,7 @@ with tab1:
     df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']]
 
     # display dataframe
-    st.subheader("Data Tabel")
+    st.subheader("Tabel")
     st.dataframe(df_filtered, use_container_width=True, hide_index=True)
 
     # Notes and API status
