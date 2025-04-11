@@ -178,6 +178,9 @@ else:
     # Enable pagination
     grid_options.configure_pagination(paginationPageSize=10)
 
+    # Enable horizontal scrolling
+    grid_options.configure_grid_options(domLayout='normal')  # Allows horizontal scrolling
+
     # Build grid options
     grid_options = grid_options.build()
 
@@ -187,7 +190,7 @@ else:
         df_filtered,
         gridOptions=grid_options,
         height=400,  # Set table height
-        fit_columns_on_grid_load=True,  # Automatically adjust column widths
+        fit_columns_on_grid_load=False,  # Keep column widths as defined
         theme="streamlit"  # Use Streamlit theme
     )
 
