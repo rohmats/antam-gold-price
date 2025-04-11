@@ -245,13 +245,14 @@ if st.session_state.buyback_results:
     st.subheader("Hasil Simulasi")
     result_data = pd.DataFrame(st.session_state.buyback_results)
     result_data.index += 1  # Increment the index for display
-
+    # format date for display
+    result_data['Tanggal Beli'] = pd.to_datetime(result_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
     # Format numerical columns
     result_data['Jumlah Emas (gram)'] = result_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
-    result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
-    result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
-    result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
-    result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"Rp {x:,.0f}")
+    result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
+    result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
+    result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
+    result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
 
     # Display the formatted table
     st.dataframe(result_data, use_container_width=True)
@@ -262,12 +263,12 @@ if st.session_state.buyback_results:
         st.session_state.buyback_results = []
         st.success("Data berhasil direset.")
 
-# Add disclaimer at the bottom of the tab
-st.markdown("""
----
-**Disclaimer**: 
-- Perhitungan ini hanya bersifat simulasi dan estimasi.
-- Belum memperhitungkan biaya transaksi, pajak, atau biaya lainnya.
-- Harga buyback dapat berubah sewaktu-waktu sesuai dengan kebijakan penyedia layanan.
-- Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
-""")
+    # Add disclaimer at the bottom of the tab
+    st.markdown("""
+    ---
+    **Disclaimer**: 
+    - Perhitungan ini hanya bersifat simulasi dan estimasi.
+    - Belum memperhitungkan biaya transaksi, pajak, atau biaya lainnya.
+    - Harga buyback dapat berubah sewaktu-waktu sesuai dengan kebijakan penyedia layanan.
+    - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
+    """)
