@@ -107,7 +107,7 @@ else:
     fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['difference'], mode='lines', name='Selisih',
                              line=dict(color='#0074D9'), yaxis='y2', hovertemplate='%{y:,.0f}<extra></extra>'))
     fig.update_layout(
-        title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=24), x=0.5, xanchor='center'),
+        title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=16), x=0.5, xanchor='center'),
         xaxis_title='Tanggal',
         yaxis_title='Harga (Rp)',
         xaxis=dict(
@@ -139,7 +139,7 @@ else:
     df_filtered.sort_values(by='date', ascending=False, inplace=True)
 
     # Format columns
-    df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %m %Y'))  # Format Tanggal as dd MM YYYY
+    df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %b %Y'))  # Format Tanggal as dd MMM YYYY
     df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
     df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
     df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
@@ -163,9 +163,25 @@ else:
 
     st.subheader("Tabel")
     grid_options = GridOptionsBuilder.from_dataframe(df_filtered)
-    grid_options.configure_default_column(filterable=True, sortable=True, resizable=True)
+
+    # Configure default column settings
+    grid_options.configure_default_column(
+        filterable=True, 
+        sortable=True, 
+        resizable=True, 
+        cellStyle={"textAlign": "right"}  # Align all columns to the right by default
+    )
+
+    # Configure specific columns
+    grid_options.configure_column("Tanggal", pinned="left", cellStyle={"textAlign": "center"})  # Center-align and freeze 'Tanggal'
+
+    # Enable pagination
     grid_options.configure_pagination(paginationPageSize=10)
+
+    # Build grid options
     grid_options = grid_options.build()
+
+    # Display the table
     AgGrid(df_filtered, gridOptions=grid_options, height=400, fit_columns_on_grid_load=True, theme="streamlit")
 
     # Notes and API status
