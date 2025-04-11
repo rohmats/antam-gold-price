@@ -108,12 +108,26 @@ else:
                              line=dict(color='#0074D9'), yaxis='y2', hovertemplate='%{y:,.0f}<extra></extra>'))
     fig.update_layout(
         title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=24), x=0.5, xanchor='center'),
-        xaxis_title='Tanggal', yaxis_title='Harga',
-        xaxis=dict(showgrid=False, tickformat='%d %b %Y'),
-        yaxis=dict(tickprefix='Rp ', separatethousands=True, tickformat=',.0f', showgrid=False),
-        yaxis2=dict(title='Selisih', overlaying='y', side='right', tickprefix='Rp ', separatethousands=True, tickformat=',.0f'),
+        xaxis_title='Tanggal',
+        yaxis_title='Harga (Rp)',
+        xaxis=dict(
+            showgrid=False,
+            tickformat='%d %b %Y'  # Keep date formatting for x-axis
+        ),
+        yaxis=dict(
+            separatethousands=True,
+            showgrid=False
+        ),
+        yaxis2=dict(
+            title='Selisih (Rp)',
+            showgrid=False,
+            overlaying='y',
+            side='right',
+            separatethousands=True
+        ),
         legend=dict(orientation="h", x=0.5, y=1, xanchor='center', yanchor='top'),
-        hovermode="x", height=800
+        hovermode="x",
+        height=800
     )
     st.subheader("Grafik")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
@@ -123,12 +137,30 @@ else:
     df_filtered['amount_buy_change'] = df_filtered['amount_buy'].diff().fillna(0)
     df_filtered['amount_selisih_change'] = df_filtered['difference'].diff().fillna(0)
     df_filtered.sort_values(by='date', ascending=False, inplace=True)
+
+    # Format columns
+    df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %m %Y'))  # Format Tanggal as dd MM YYYY
+    df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+    df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+    df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+    df_filtered['amount_sell_change'] = df_filtered['amount_sell_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+    df_filtered['amount_buy_change'] = df_filtered['amount_buy_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+    df_filtered['amount_selisih_change'] = df_filtered['amount_selisih_change'].apply(lambda x: f"{int(x):,}".replace(',', '.'))  # Remove decimals
+
+    # Rename columns for display
     df_filtered.rename(columns={
-        'date': 'Tanggal', 'amount_sell': 'Harga Jual', 'amount_buy': 'Harga Beli',
-        'difference': 'Selisih', 'amount_sell_change': 'Perubahan Jual',
-        'amount_buy_change': 'Perubahan Beli', 'amount_selisih_change': 'Perubahan Selisih'
+        'date': 'Tanggal', 
+        'amount_sell': 'Harga Jual', 
+        'amount_buy': 'Harga Beli',
+        'difference': 'Selisih', 
+        'amount_sell_change': 'Perubahan Jual',
+        'amount_buy_change': 'Perubahan Beli', 
+        'amount_selisih_change': 'Perubahan Selisih'
     }, inplace=True)
+
+    # Reorder columns
     df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Selisih', 'Perubahan Selisih']]
+
     st.subheader("Tabel")
     grid_options = GridOptionsBuilder.from_dataframe(df_filtered)
     grid_options.configure_default_column(filterable=True, sortable=True, resizable=True)
