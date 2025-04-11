@@ -178,11 +178,20 @@ else:
     # Enable pagination
     grid_options.configure_pagination(paginationPageSize=10)
 
+    # Enable horizontal scrolling for mobile devices
+    grid_options.configure_grid_options(domLayout='autoHeight')  # Adjust height automatically
+
     # Build grid options
     grid_options = grid_options.build()
 
-    # Display the table
-    AgGrid(df_filtered, gridOptions=grid_options, height=400, fit_columns_on_grid_load=True, theme="streamlit")
+    # Display the table with responsive settings
+    AgGrid(
+        df_filtered,
+        gridOptions=grid_options,
+        height=400,  # Set a fixed height for better usability
+        fit_columns_on_grid_load=True,  # Automatically adjust column widths
+        theme="streamlit"
+    )
 
     # Notes and API status
     st.subheader("Catatan")
