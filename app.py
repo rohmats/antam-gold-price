@@ -32,25 +32,25 @@ def process_json_to_dataframe(data):
 @st.cache_data
 def fetch_data():
     try:
-        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy")
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
+        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10)
+        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10)
         
         buy_response.raise_for_status()
         sell_response.raise_for_status()
-        sell = sell_response.json()
-        buy = buy_response.json()
+        sell_data = sell_response.json()
+        buy_data = buy_response.json()
         with open('antam_sell.json', 'w', encoding='utf-8') as f:
-            json.dump(sell, f)
+            json.dump(sell_data, f)
         with open('antam_buy.json', 'w', encoding='utf-8') as f:
-            json.dump(buy, f)
-        return sell, buy, None
+            json.dump(buy_data, f)
+        return sell_data, buy_data, None
     except (requests.RequestException, json.JSONDecodeError) as error:
         try:
             with open('antam_sell.json', 'r', encoding='utf-8') as f:
-                sell = json.load(f)
+                sell_data_local = json.load(f)
             with open('antam_buy.json', 'r', encoding='utf-8') as f:
-                buy = json.load(f)
-            return sell, buy, error
+                buy_data_local = json.load(f)
+            return sell_data_local, buy_data_local, error
         except FileNotFoundError:
             st.error("Local data files not found. Exiting.")
             st.stop()
@@ -77,6 +77,7 @@ with tab1:
     selected_option = st.selectbox("Pilih Rentang Waktu", relative_date_options, index=3)
 
     # Determine start and end dates
+    start_date, end_date = None, None  # Default assignment to avoid uninitialized variables
     if selected_option == "7 Hari Terakhir":
         start_date, end_date = date.today() - timedelta(days=7), date.today()
     elif selected_option == "30 Hari Terakhir":
