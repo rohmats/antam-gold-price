@@ -201,8 +201,11 @@ with tab2:
     # Create a form for user input
     with st.form("buyback_form", clear_on_submit=True):
         st.subheader("Tambah Data Buyback")
-        jumlah_emas = st.number_input("Jumlah Emas (gram)", min_value=0.0, step=0.1, value=0.0)
-        tanggal_beli = st.date_input("Tanggal Beli", value=date.today())
+        col1, col2 = st.columns(2)
+        with col1:
+            jumlah_emas = st.number_input("Jumlah Emas (gram)", min_value=0.0, step=0.1, value=0.0)
+        with col2:
+            tanggal_beli = st.date_input("Tanggal Beli", value=date.today())
         submitted = st.form_submit_button("Hitung")
 
     # Process user input after form submission
@@ -220,8 +223,11 @@ with tab2:
                 st.stop()
         else:
             harga_beli_per_gram = df_combined.loc[df_combined['date'] == tanggal_beli, 'amount_sell'].values[0]
-            st.success(f"Harga beli per gram pada {tanggal_beli.strftime('%d %B %Y')}: **Rp {harga_beli_per_gram:,.0f}**")
-            st.success(f"Total harga beli: **Rp {jumlah_emas * harga_beli_per_gram:,.0f}**")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.success(f"Harga beli per gram pada {tanggal_beli.strftime('%d %B %Y')}: **Rp {harga_beli_per_gram:,.0f}**")
+            with col2:
+                st.success(f"Total harga beli: **Rp {jumlah_emas * harga_beli_per_gram:,.0f}**")
         
         # Calculate total buy and sell prices
         harga_beli_per_gram = float(harga_beli_per_gram)
@@ -258,7 +264,25 @@ if st.session_state.buyback_results:
 
     # Display the formatted table
     st.dataframe(result_data, use_container_width=True)
-    st.info(f"Total Keuntungan/Rugi: **Rp {result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum():,.0f}**")
+    # Total calculations
+    total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
+    total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+    total_harga_jual = result_data['Total Harga Jual (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+    total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+    total_investment = total_harga_beli
+    profit_loss_percentage = (total_profit_loss / total_investment) * 100 if total_investment > 0 else 0
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info(f"""
+        **Total Emas**: {total_emas:,.1f} gram  
+        **Total Harga Beli**: Rp {total_harga_beli:,.0f}
+        """)
+    with col2:
+        st.info(f"""
+        **Total Keuntungan/Rugi**: Rp {total_profit_loss:,.0f}  
+        **Total Persentase Keuntungan/Rugi**: {profit_loss_percentage:.2f}%
+        """)
 
     # Add a reset button
     if st.button("Reset Data"):
