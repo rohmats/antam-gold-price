@@ -29,40 +29,30 @@ def process_json_to_dataframe(data):
     return df
 
 # Function to fetch data from APIs or load local files
+@st.cache_data
 def fetch_data():
     try:
-        # Ambil data dari API
-        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10)
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10)
+        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy")
+        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
         
-        # Pastikan respons API berhasil
         buy_response.raise_for_status()
         sell_response.raise_for_status()
-        
-        # Parse data JSON dari API
         sell = sell_response.json()
         buy = buy_response.json()
-        
-        # Perbarui file JSON lokal
-        with open('./antam_sell.json', 'w', encoding='utf-8') as f:
-            json.dump(sell, f, ensure_ascii=False, indent=4)
-        with open('./antam_buy.json', 'w', encoding='utf-8') as f:
-            json.dump(buy, f, ensure_ascii=False, indent=4)
-        
-        # Kembalikan data dari API
+        with open('antam_sell.json', 'w', encoding='utf-8') as f:
+            json.dump(sell, f)
+        with open('antam_buy.json', 'w', encoding='utf-8') as f:
+            json.dump(buy, f)
         return sell, buy, None
     except (requests.RequestException, json.JSONDecodeError) as error:
-        st.warning("Gagal mengambil data dari API. Menggunakan data lokal.")
         try:
-            # Gunakan data lokal jika API gagal
-            with open('./antam_sell.json', 'r', encoding='utf-8') as f:
+            with open('antam_sell.json', 'r', encoding='utf-8') as f:
                 sell = json.load(f)
-            with open('./antam_buy.json', 'r', encoding='utf-8') as f:
+            with open('antam_buy.json', 'r', encoding='utf-8') as f:
                 buy = json.load(f)
             return sell, buy, error
         except FileNotFoundError:
-            # Jika data lokal juga tidak tersedia, hentikan aplikasi
-            st.error("Data lokal tidak ditemukan. Tidak dapat melanjutkan.")
+            st.error("Local data files not found. Exiting.")
             st.stop()
 
 # Fetch and process data
