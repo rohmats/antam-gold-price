@@ -79,13 +79,13 @@ with tab1:
     # Determine start and end dates
     start_date, end_date = None, None  # Default assignment to avoid uninitialized variables
     if selected_option == "7 Hari Terakhir":
-        start_date, end_date = date.today() - timedelta(days=7), date.today()
+        start_date, end_date = date.today() - timedelta(days=6), date.today()
     elif selected_option == "30 Hari Terakhir":
-        start_date, end_date = date.today() - timedelta(days=30), date.today()
+        start_date, end_date = date.today() - timedelta(days=29), date.today()
     elif selected_option == "6 Bulan Terakhir":
-        start_date, end_date = date.today() - timedelta(days=6 * 30), date.today()
+        start_date, end_date = date.today() - timedelta(days=6 * 30 - 1), date.today()
     elif selected_option == "1 Tahun Terakhir":
-        start_date, end_date = date.today().replace(year=date.today().year - 1), date.today()
+        start_date, end_date = date.today().replace(year=date.today().year - 1) + timedelta(days=1), date.today()
     elif selected_option == "Tampilkan Semua":
         start_date, end_date = df_combined['date'].min(), df_combined['date'].max()
 
