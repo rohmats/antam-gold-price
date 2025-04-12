@@ -29,26 +29,32 @@ def process_json_to_dataframe(data):
     return df
 
 # Function to fetch data from APIs or load local files
-@st.cache_data
 def fetch_data():
     try:
-        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy")
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
+        # Fetch data from the API
+        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10)
+        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10)
         
         buy_response.raise_for_status()
         sell_response.raise_for_status()
+        
+        # Parse JSON responses
         sell = sell_response.json()
         buy = buy_response.json()
-        with open('antam_sell.json', 'w', encoding='utf-8') as f:
-            json.dump(sell, f)
-        with open('antam_buy.json', 'w', encoding='utf-8') as f:
-            json.dump(buy, f)
+        
+        # Write data to JSON files in the repository
+        with open('./antam_sell.json', 'w', encoding='utf-8') as f:
+            json.dump(sell, f, ensure_ascii=False, indent=4)
+        with open('./antam_buy.json', 'w', encoding='utf-8') as f:
+            json.dump(buy, f, ensure_ascii=False, indent=4)
+        
         return sell, buy, None
     except (requests.RequestException, json.JSONDecodeError) as error:
         try:
-            with open('antam_sell.json', 'r', encoding='utf-8') as f:
+            # Fallback to local JSON files if API fails
+            with open('./antam_sell.json', 'r', encoding='utf-8') as f:
                 sell = json.load(f)
-            with open('antam_buy.json', 'r', encoding='utf-8') as f:
+            with open('./antam_buy.json', 'r', encoding='utf-8') as f:
                 buy = json.load(f)
             return sell, buy, error
         except FileNotFoundError:
