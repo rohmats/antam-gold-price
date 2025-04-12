@@ -32,10 +32,11 @@ def process_json_to_dataframe(data):
 @st.cache_data
 def fetch_data():
     try:
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
         buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy")
-        sell_response.raise_for_status()
+        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell")
+        
         buy_response.raise_for_status()
+        sell_response.raise_for_status()
         sell = sell_response.json()
         buy = buy_response.json()
         with open('antam_sell.json', 'w', encoding='utf-8') as f:
