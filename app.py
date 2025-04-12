@@ -286,15 +286,16 @@ if st.session_state.buyback_results:
 
     # Add a reset button
     if st.button("Reset Data"):
-        st.session_state.buyback_results = []
-        st.success("Data berhasil direset.")
+        # Reset specific session state variables
+        if "buyback_results" in st.session_state:
+            st.session_state.buyback_results = []
 
-    # Add disclaimer at the bottom of the tab
-    st.markdown("""
-    ---
-    **Disclaimer**: 
-    - Perhitungan ini hanya bersifat simulasi dan estimasi.
-    - Belum memperhitungkan biaya transaksi, pajak, atau biaya lainnya.
-    - Harga buyback dapat berubah sewaktu-waktu sesuai dengan kebijakan penyedia layanan.
-    - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
-    """)
+    # Display disclaimer
+        st.markdown("""
+        ---
+        **Disclaimer**: 
+        - Perhitungan ini hanya bersifat simulasi dan estimasi.
+        - Belum memperhitungkan biaya transaksi, pajak, atau biaya lainnya.
+        - Harga buyback dapat berubah sewaktu-waktu sesuai dengan kebijakan penyedia layanan.
+        - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
+        """)
