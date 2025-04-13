@@ -317,7 +317,8 @@ if st.session_state.buyback_results:
         if "buyback_results" in st.session_state:
             st.session_state.buyback_results = []
 
-    # Display disclaimer
+    # Display disclaimer only in Tab 2
+    if tab2:
         st.markdown("""
         ---
         **Disclaimer**: 
