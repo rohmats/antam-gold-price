@@ -31,9 +31,26 @@ def process_json_to_dataframe(data):
 # Function to fetch data from APIs or load local files
 @st.cache_data
 def fetch_data():
+    headers = {
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'id,en-US;q=0.9,en;q=0.8,en-GB;q=0.7',
+        'cache-control': 'max-age=0',
+        'dnt': '1',
+        'priority': 'u=0, i',
+        'sec-ch-ua': '"Microsoft Edge";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'cross-site',
+        'sec-fetch-user': '?1',
+        'sec-gpc': '1',
+        'upgrade-insecure-requests': '1',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
+    }
     try:
-        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10)
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10)
+        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
+        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
         
         buy_response.raise_for_status()
         sell_response.raise_for_status()
