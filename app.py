@@ -300,10 +300,16 @@ if st.session_state.buyback_results:
         **Total Harga Beli**: Rp {total_harga_beli:,.0f}
         """)
     with col2:
-        st.info(f"""
-        **Total Keuntungan/Rugi**: Rp {total_profit_loss:,.0f}  
-        **Total Persentase Keuntungan/Rugi**: {profit_loss_percentage:.2f}%
-        """)
+        if total_profit_loss >= 0:
+            st.success(f"""
+            **Total Keuntungan**: Rp {total_profit_loss:,.0f}  
+            **Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
+            """)
+        else:
+            st.error(f"""
+            **Total Rugi**: Rp {total_profit_loss:,.0f}  
+            **Total Persentase Rugi**: {profit_loss_percentage:.2f}%
+            """)
 
     # Add a reset button
     if st.button("Reset Data"):
