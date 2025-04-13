@@ -269,56 +269,55 @@ with tab2:
     elif submitted:
         st.warning("Masukkan jumlah emas yang valid untuk menghitung.")
 
-# Display all results
-if st.session_state.buyback_results:
-    st.subheader("Hasil Simulasi")
-    result_data = pd.DataFrame(st.session_state.buyback_results)
-    result_data.index += 1  # Increment the index for display
-    # format date for display
-    result_data['Tanggal Beli'] = pd.to_datetime(result_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
-    # Format numerical columns
-    result_data['Jumlah Emas (gram)'] = result_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
-    result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
-    result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
-    result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
-    result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
+    # Display all results
+    if st.session_state.buyback_results:
+        st.subheader("Hasil Simulasi")
+        result_data = pd.DataFrame(st.session_state.buyback_results)
+        result_data.index += 1  # Increment the index for display
+        # format date for display
+        result_data['Tanggal Beli'] = pd.to_datetime(result_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
+        # Format numerical columns
+        result_data['Jumlah Emas (gram)'] = result_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
+        result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
+        result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
+        result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
+        result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
 
-    # Display the formatted table
-    st.dataframe(result_data, use_container_width=True)
-    # Total calculations
-    total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
-    total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
-    total_harga_jual = result_data['Total Harga Jual (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
-    total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
-    total_investment = total_harga_beli
-    profit_loss_percentage = (total_profit_loss / total_investment) * 100 if total_investment > 0 else 0
+        # Display the formatted table
+        st.dataframe(result_data, use_container_width=True)
+        # Total calculations
+        total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
+        total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+        total_harga_jual = result_data['Total Harga Jual (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+        total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+        total_investment = total_harga_beli
+        profit_loss_percentage = (total_profit_loss / total_investment) * 100 if total_investment > 0 else 0
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.info(f"""
-        **Total Emas**: {total_emas:,.1f} gram  
-        **Total Harga Beli**: Rp {total_harga_beli:,.0f}
-        """)
-    with col2:
-        if total_profit_loss >= 0:
-            st.success(f"""
-            **Total Keuntungan**: Rp {total_profit_loss:,.0f}  
-            **Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"""
+            **Total Emas**: {total_emas:,.1f} gram  
+            **Total Harga Beli**: Rp {total_harga_beli:,.0f}
             """)
-        else:
-            st.error(f"""
-            **Total Rugi**: Rp {total_profit_loss:,.0f}  
-            **Total Persentase Rugi**: {profit_loss_percentage:.2f}%
-            """)
+        with col2:
+            if total_profit_loss >= 0:
+                st.success(f"""
+                **Total Keuntungan**: Rp {total_profit_loss:,.0f}  
+                **Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
+                """)
+            else:
+                st.error(f"""
+                **Total Rugi**: Rp {total_profit_loss:,.0f}  
+                **Total Persentase Rugi**: {profit_loss_percentage:.2f}%
+                """)
 
-    # Add a reset button
-    if st.button("Reset Data"):
-        # Reset specific session state variables
-        if "buyback_results" in st.session_state:
-            st.session_state.buyback_results = []
+        # Add a reset button
+        if st.button("Reset Data"):
+            # Reset specific session state variables
+            if "buyback_results" in st.session_state:
+                st.session_state.buyback_results = []
 
-    # Display disclaimer only in Tab 2
-    if tab2:
+    # Display disclaimer
         st.markdown("""
         ---
         **Disclaimer**: 
