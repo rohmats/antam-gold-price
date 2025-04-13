@@ -168,12 +168,13 @@ with tab1:
 
     # Notes and API status
     st.subheader("Catatan")
-    st.markdown(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
     st.markdown("""
     - Data diambil dari API dan disimpan secara lokal.
     - Jika API tidak dapat diakses, data lokal akan digunakan.
     - Data ditampilkan dalam format tabel dan grafik.
     """)
+    st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
+
     st.subheader("Status API")
     st.markdown("""
     - API menggunakan [logam-mulia API](https://logam-mulia.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
@@ -194,13 +195,14 @@ with tab2:
     if "buyback_results" not in st.session_state:
         st.session_state.buyback_results = []
 
-    # Today's buyback price
-    today_buyback_price = df_combined['amount_buy'].iloc[-1] if not df_combined.empty else 0
-    st.info(f"Harga buyback saat ini: **Rp {today_buyback_price:,.0f}** per gram")
+    # Last buyback date and price
+    last_buyback_date = df_combined['date'].max()
+    today_buyback_price = df_combined.loc[df_combined['date'] == last_buyback_date, 'amount_buy'].values[0]
+    st.info(f"Harga Buyback Terkini ({last_buyback_date.strftime('%d %B %Y')}): Rp {today_buyback_price:,.0f}")
 
     # Create a form for user input
     with st.form("buyback_form", clear_on_submit=True):
-        st.subheader("Tambah Data Buyback")
+        st.subheader("Tambah Data Pembelian Emas")
         col1, col2 = st.columns(2)
         with col1:
             jumlah_emas = st.number_input("Jumlah Emas (gram)", min_value=0.0, step=0.1, value=0.0)
