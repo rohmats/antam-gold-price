@@ -51,8 +51,6 @@ def fetch_data():
     try:
         buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
         sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
-
         
         buy_response.raise_for_status()
         sell_response.raise_for_status()
