@@ -49,8 +49,8 @@ def fetch_data():
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
     }
     try:
-        buy_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
-        sell_response = requests.get("https://logam-mulia.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
+        buy_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
+        sell_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
         
         buy_response.raise_for_status()
         sell_response.raise_for_status()
