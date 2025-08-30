@@ -194,7 +194,7 @@ with tab1:
 
     st.subheader("Status API")
     st.markdown("""
-    - API menggunakan [logam-mulia API](https://logam-mulia.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
+    - API menggunakan [logam-mulia API](https://hargaemas.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
     """)
     if e:
         st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
