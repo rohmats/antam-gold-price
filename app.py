@@ -183,7 +183,7 @@ with tab1:
             height=600
         )
         st.subheader("Grafik")
-        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig, width=None, config={"displayModeBar": False})
 
     # copy data for display dataframe
     df_filtered = df_filtered.copy()
@@ -222,7 +222,7 @@ with tab1:
 
     # display dataframe
     st.subheader("Tabel")
-    st.dataframe(df_filtered, use_container_width=True, hide_index=True)
+    st.dataframe(df_filtered, width=None, hide_index=True)
 
     # Notes and API status
     st.subheader("Catatan")
@@ -314,7 +314,7 @@ with tab2:
         result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
 
         # Display the formatted table
-        st.dataframe(result_data, use_container_width=True)
+    st.dataframe(result_data, width=None)
         # Total calculations
         total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
         total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
