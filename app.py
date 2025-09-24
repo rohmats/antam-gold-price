@@ -94,9 +94,11 @@ def fetch_data():
                 token=github_token
             )
             if status_buy == 200 and status_sell == 200:
-                st.success("JSON files updated in GitHub repository.")
+                # Set a flag to show success at the bottom
+                st.session_state.github_update_success = True
             else:
-                st.warning(f"GitHub API update failed: {result_buy.get('message', '')} {result_sell.get('message', '')}")
+                st.session_state.github_update_success = False
+                st.session_state.github_update_error = f"GitHub API update failed: {result_buy.get('message', '')} {result_sell.get('message', '')}"
         else:
             st.info("GitHub token not found in Streamlit app settings. JSON files only updated locally.")
         return sell_data, buy_data, None
@@ -365,3 +367,10 @@ if e:
     st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
 else:
     st.success("Data berhasil diambil dari API.")
+
+# Show GitHub update status at the bottom
+if 'github_update_success' in st.session_state:
+    if st.session_state.github_update_success:
+        st.success("JSON files updated in GitHub repository.")
+    elif 'github_update_error' in st.session_state:
+        st.warning(st.session_state.github_update_error)
