@@ -62,8 +62,8 @@ def fetch_data():
             json.dump(buy_data, f)
         # Update files in GitHub repo
         import subprocess
-        subprocess.run(["git", "add", "antam_sell.json", "antam_buy.json"], check=False)
-        subprocess.run(["git", "commit", "-m", "Update antam_buy and antam_sell data from API"], check=False)
+        subprocess.run(["git", "add", "-A"], check=False)
+        subprocess.run(["git", "commit", "--allow-empty", "-m", "Update antam_buy and antam_sell data from API"], check=False)
         subprocess.run(["git", "push"], check=False)
         return sell_data, buy_data, None
     except (requests.RequestException, json.JSONDecodeError) as error:
