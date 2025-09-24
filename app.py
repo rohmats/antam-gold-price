@@ -51,15 +51,20 @@ def fetch_data():
     try:
         buy_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
         sell_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
-        
         buy_response.raise_for_status()
         sell_response.raise_for_status()
         sell_data = sell_response.json()
         buy_data = buy_response.json()
+        # Update local files
         with open('antam_sell.json', 'w', encoding='utf-8') as f:
             json.dump(sell_data, f)
         with open('antam_buy.json', 'w', encoding='utf-8') as f:
             json.dump(buy_data, f)
+        # Update files in GitHub repo
+        import subprocess
+        subprocess.run(["git", "add", "antam_sell.json", "antam_buy.json"], check=False)
+        subprocess.run(["git", "commit", "-m", "Update antam_buy and antam_sell data from API"], check=False)
+        subprocess.run(["git", "push"], check=False)
         return sell_data, buy_data, None
     except (requests.RequestException, json.JSONDecodeError) as error:
         try:
