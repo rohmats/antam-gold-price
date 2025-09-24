@@ -229,16 +229,7 @@ with tab1:
     - Jika API tidak dapat diakses, data lokal akan digunakan.
     - Data ditampilkan dalam format tabel dan grafik.
     """)
-    st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
-
-    st.subheader("Status API")
-    st.markdown("""
-    - API menggunakan [logam-mulia API](https://hargaemas.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
-    """)
-    if e:
-        st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
-    else:
-        st.success("Data berhasil diambil dari API.")
+    # ...existing code...
 
 
 
@@ -363,3 +354,14 @@ with tab2:
         - Harga buyback dapat berubah sewaktu-waktu sesuai dengan kebijakan penyedia layanan.
         - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
         """)
+
+# Show info and success/error at the very bottom of the page
+st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
+st.subheader("Status API")
+st.markdown("""
+- API menggunakan [logam-mulia API](https://hargaemas.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
+""")
+if e:
+    st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
+else:
+    st.success("Data berhasil diambil dari API.")
