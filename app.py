@@ -60,23 +60,46 @@ def fetch_data():
             json.dump(sell_data, f)
         with open('antam_buy.json', 'w', encoding='utf-8') as f:
             json.dump(buy_data, f)
-        # Update files in GitHub repo with error handling
-        import subprocess
-        def git_commit_json_files():
-            try:
-                result_add = subprocess.run([
-                    "git", "add", "antam_buy.json", "antam_sell.json"
-                ], capture_output=True, text=True, check=True)
-                result_commit = subprocess.run([
-                    "git", "commit", "-m", "Update antam_buy and antam_sell data from API"
-                ], capture_output=True, text=True, check=True)
-                result_push = subprocess.run([
-                    "git", "push"
-                ], capture_output=True, text=True, check=True)
-                st.success("JSON files committed and pushed to GitHub.")
-            except subprocess.CalledProcessError as err:
-                st.warning(f"Git operation failed: {err.stderr}")
-        git_commit_json_files()
+        # Update files in GitHub repo using GitHub API (works on any platform)
+        import base64
+        import requests
+        def update_github_file(repo, path, content, commit_message, token):
+            url = f"https://api.github.com/repos/{repo}/contents/{path}"
+            headers = {"Authorization": f"token {token}"}
+            r = requests.get(url, headers=headers)
+            sha = r.json().get("sha")
+            data = {
+                "message": commit_message,
+                "content": base64.b64encode(content.encode()).decode(),
+                "sha": sha
+            }
+            response = requests.put(url, headers=headers, json=data)
+            return response.status_code, response.json()
+
+        # Get token from Streamlit app settings
+        github_token = st.secrets["GITHUB_TOKEN"] if "GITHUB_TOKEN" in st.secrets else None
+        github_repo = "rohmats/antam-gold-price"
+        if github_token:
+            status_buy, result_buy = update_github_file(
+                repo=github_repo,
+                path="antam_buy.json",
+                content=json.dumps(buy_data),
+                commit_message="Update antam_buy data from API",
+                token=github_token
+            )
+            status_sell, result_sell = update_github_file(
+                repo=github_repo,
+                path="antam_sell.json",
+                content=json.dumps(sell_data),
+                commit_message="Update antam_sell data from API",
+                token=github_token
+            )
+            if status_buy == 200 and status_sell == 200:
+                st.success("JSON files updated in GitHub repository.")
+            else:
+                st.warning(f"GitHub API update failed: {result_buy.get('message', '')} {result_sell.get('message', '')}")
+        else:
+            st.info("GitHub token not found in Streamlit app settings. JSON files only updated locally.")
         return sell_data, buy_data, None
     except (requests.RequestException, json.JSONDecodeError) as error:
         try:
