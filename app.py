@@ -314,7 +314,7 @@ with tab2:
         result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
 
         # Display the formatted table
-    st.dataframe(result_data, width=None)
+        st.dataframe(result_data, width=None)
         # Total calculations
         total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
         total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
@@ -326,20 +326,20 @@ with tab2:
         col1, col2 = st.columns(2)
         with col1:
             st.info(f"""
-            **Total Emas**: {total_emas:,.1f} gram  
-            **Total Harga Beli**: Rp {total_harga_beli:,.0f}
-            """)
+**Total Emas**: {total_emas:,.1f} gram  
+**Total Harga Beli**: Rp {total_harga_beli:,.0f}
+""")
         with col2:
             if total_profit_loss >= 0:
                 st.success(f"""
-                **Total Keuntungan**: Rp {total_profit_loss:,.0f}  
-                **Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
-                """)
+**Total Keuntungan**: Rp {total_profit_loss:,.0f}  
+**Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
+""")
             else:
                 st.error(f"""
-                **Total Rugi**: Rp {total_profit_loss:,.0f}  
-                **Total Persentase Rugi**: {profit_loss_percentage:.2f}%
-                """)
+**Total Rugi**: Rp {total_profit_loss:,.0f}  
+**Total Persentase Rugi**: {profit_loss_percentage:.2f}%
+""")
 
         # Add a reset button
         if st.button("Reset Data"):
