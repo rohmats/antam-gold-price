@@ -62,7 +62,6 @@ def fetch_data():
             json.dump(buy_data, f)
         # Update files in GitHub repo using GitHub API (works on any platform)
         import base64
-        import requests
         def update_github_file(repo, path, content, commit_message, token):
             url = f"https://api.github.com/repos/{repo}/contents/{path}"
             headers = {"Authorization": f"token {token}"}
