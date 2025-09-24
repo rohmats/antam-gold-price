@@ -60,11 +60,23 @@ def fetch_data():
             json.dump(sell_data, f)
         with open('antam_buy.json', 'w', encoding='utf-8') as f:
             json.dump(buy_data, f)
-        # Update files in GitHub repo
+        # Update files in GitHub repo with error handling
         import subprocess
-        subprocess.run(["git", "add", "-A"], check=False)
-        subprocess.run(["git", "commit", "--allow-empty", "-m", "Update antam_buy and antam_sell data from API"], check=False)
-        subprocess.run(["git", "push"], check=False)
+        def git_commit_json_files():
+            try:
+                result_add = subprocess.run([
+                    "git", "add", "antam_buy.json", "antam_sell.json"
+                ], capture_output=True, text=True, check=True)
+                result_commit = subprocess.run([
+                    "git", "commit", "-m", "Update antam_buy and antam_sell data from API"
+                ], capture_output=True, text=True, check=True)
+                result_push = subprocess.run([
+                    "git", "push"
+                ], capture_output=True, text=True, check=True)
+                st.success("JSON files committed and pushed to GitHub.")
+            except subprocess.CalledProcessError as err:
+                st.warning(f"Git operation failed: {err.stderr}")
+        git_commit_json_files()
         return sell_data, buy_data, None
     except (requests.RequestException, json.JSONDecodeError) as error:
         try:
