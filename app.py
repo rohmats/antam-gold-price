@@ -130,6 +130,15 @@ tab1, tab2 = st.tabs(["Harga Emas", "Simulasi Buyback"])
 # Tab 1: Harga Emas (existing content)
 with tab1:
     st.title("Harga Emas Antam")
+    # Subtitle / deskripsi aplikasi (disingkat)
+    st.markdown(
+        """
+        Aplikasi ini dibuat dari keresahan pribadi: ribet saat mengecek harga emas karena harus membuka beberapa halaman. 
+        Aplikasi ringkas ini menyatukan harga jual dan beli dalam satu grafik dan tabel agar lebih cepat dibandingkan. 
+        Sumber data: [Logam Mulia - Antam](https://logammulia.com). Terinspirasi oleh proyek [ferryops](https://hargaemas.vercel.app/).
+        Tersedia juga fitur Simulasi Buyback untuk menghitung perkiraan keuntungan atau kerugian dari buyback emas Anda.
+        """
+    )
     # Dropdown for relative date options
     relative_date_options = ["7 Hari Terakhir", "30 Hari Terakhir", "6 Bulan Terakhir", "1 Tahun Terakhir", "Tampilkan Semua"]
     selected_option = st.selectbox("Pilih Rentang Waktu", relative_date_options, index=3)
