@@ -1,0 +1,38 @@
+name: Scrape ANTAM Gold Prices
+
+on:
+  schedule:
+    # Run every day at 00:00, 08:00, and 16:00 UTC (07:00, 15:00, 23:00 WIB)
+    - cron: '0 0,8,16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraper
+        run: npm run scrape
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update ANTAM gold price data $(date -u +'%Y-%m-%d %H:%M:%S')" && git push)
