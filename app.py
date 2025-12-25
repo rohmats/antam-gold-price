@@ -5,7 +5,6 @@ from plotly import io as pio
 import json
 from datetime import date, timedelta
 
-# Set page configuration
 st.set_page_config(
     page_title="Harga Emas Antam",
     page_icon=":bar_chart:",
@@ -13,7 +12,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Set Plotly dark theme
 pio.templates.default = "plotly_dark"
 
 # Function to process JSON data into a DataFrame
@@ -21,7 +19,7 @@ pio.templates.default = "plotly_dark"
 def process_json_to_dataframe(data):
     df = pd.DataFrame(data)
     df.rename(columns={df.columns[0]: "date", df.columns[1]: "amount"}, inplace=True)
-    if df['date'].max() > 10**10:  # Convert milliseconds to seconds if needed
+    if df['date'].max() > 10**10:
         df['date'] = df['date'] // 1000
     df['date'] = pd.to_datetime(df['date'], unit='s').dt.date
     df['amount'] = pd.to_numeric(df['amount'])
@@ -39,17 +37,14 @@ def load_local_data():
         st.error("File antam_sell.json atau antam_buy.json tidak ditemukan. Pastikan scraper sudah berjalan.")
         st.stop()
 
-# Fetch and process data (local files maintained by GitHub Actions scraper)
+# Load and process data
 sell, buy = load_local_data()
 df_sell = process_json_to_dataframe(sell)
 df_buy = process_json_to_dataframe(buy)
 
-# Combine and preprocess data
 df_combined = pd.merge(df_sell, df_buy, on='date', how='outer', suffixes=('_sell', '_buy'))
-df_combined['date'] = df_combined['date']
 df_combined['difference'] = df_combined['amount_sell'] - df_combined['amount_buy']
-df_combined = df_combined.drop_duplicates(subset=['date'], keep='last')
-df_combined = df_combined.sort_values('date')
+df_combined = df_combined.drop_duplicates(subset=['date'], keep='last').sort_values('date')
 
 # Add tabs for different sections
 tab1, tab2 = st.tabs(["Harga Emas", "Simulasi Buyback"])
@@ -57,7 +52,6 @@ tab1, tab2 = st.tabs(["Harga Emas", "Simulasi Buyback"])
 # Tab 1: Harga Emas (existing content)
 with tab1:
     st.title("Harga Emas Antam")
-    # Subtitle / deskripsi aplikasi (disingkat)
     st.markdown(
         """
         Aplikasi ini dibuat dari keresahan pribadi: ribet saat mengecek harga emas karena harus membuka beberapa halaman. 
@@ -66,27 +60,21 @@ with tab1:
         Sumber data: [Logam Mulia - Antam](https://logammulia.com).
         """
     )
-    # Dropdown for relative date options
+    
     relative_date_options = ["7 Hari Terakhir", "30 Hari Terakhir", "6 Bulan Terakhir", "1 Tahun Terakhir", "Tampilkan Semua"]
     selected_option = st.selectbox("Pilih Rentang Waktu", relative_date_options, index=3)
 
-    # Determine start and end dates
-    start_date, end_date = None, None  # Default assignment to avoid uninitialized variables
-    if selected_option == "7 Hari Terakhir":
-        start_date, end_date = date.today() - timedelta(days=6), date.today()
-    elif selected_option == "30 Hari Terakhir":
-        start_date, end_date = date.today() - timedelta(days=29), date.today()
-    elif selected_option == "6 Bulan Terakhir":
-        start_date, end_date = date.today() - timedelta(days=6 * 30 - 1), date.today()
-    elif selected_option == "1 Tahun Terakhir":
-        start_date, end_date = date.today().replace(year=date.today().year - 1) + timedelta(days=1), date.today()
-    elif selected_option == "Tampilkan Semua":
-        start_date, end_date = df_combined['date'].min(), df_combined['date'].max()
+    date_mapping = {
+        "7 Hari Terakhir": (date.today() - timedelta(days=6), date.today()),
+        "30 Hari Terakhir": (date.today() - timedelta(days=29), date.today()),
+        "6 Bulan Terakhir": (date.today() - timedelta(days=179), date.today()),
+        "1 Tahun Terakhir": (date.today().replace(year=date.today().year - 1) + timedelta(days=1), date.today()),
+        "Tampilkan Semua": (df_combined['date'].min(), df_combined['date'].max()),
+    }
+    start_date, end_date = date_mapping[selected_option]
 
-    # Filter data
-    df_filtered = df_combined[(df_combined['date'] >= start_date) & (df_combined['date'] <= end_date)]
+    df_filtered = df_combined[(df_combined['date'] >= start_date) & (df_combined['date'] <= end_date)].copy()
 
-    # Plotly chart
     fig = go.Figure()
     if not df_filtered.empty:
         fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['amount_sell'], mode='lines', name='Jual',
@@ -95,29 +83,17 @@ with tab1:
                                  fill='tozeroy', line=dict(color='#2ECC40'), hovertemplate='%{y:,.0f}<extra></extra>'))
         fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['difference'], mode='lines', name='Selisih',
                                  line=dict(color='#0074D9'), yaxis='y2', hovertemplate='%{y:,.0f}<extra></extra>'))
-        # Determine Y-axis min and max based on filtered data
+        
         y_min = min(df_filtered['amount_sell'].min(), df_filtered['amount_buy'].min()) - 50000
         y_max = max(df_filtered['amount_sell'].max(), df_filtered['amount_buy'].max()) + 50000
+        
         fig.update_layout(
             title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Tanggal',
             yaxis_title='Harga (Rp)',
-            xaxis=dict(
-                showgrid=False,
-                tickformat='%d %b %Y'  # Keep date formatting for x-axis
-            ),
-            yaxis=dict(
-                separatethousands=True,
-                showgrid=False,
-                range=[y_min, y_max]
-            ),
-            yaxis2=dict(
-                title='Selisih (Rp)',
-                showgrid=False,
-                overlaying='y',
-                side='right',
-                separatethousands=True
-            ),
+            xaxis=dict(showgrid=False, tickformat='%d %b %Y'),
+            yaxis=dict(separatethousands=True, showgrid=False, range=[y_min, y_max]),
+            yaxis2=dict(title='Selisih (Rp)', showgrid=False, overlaying='y', side='right', separatethousands=True),
             legend=dict(orientation="h", x=0.5, y=1.1, xanchor='center', yanchor='top'),
             hovermode="x",
             height=600
@@ -126,63 +102,46 @@ with tab1:
     else:
         fig.add_annotation(text="Tidak ada data untuk rentang ini", xref="paper", yref="paper", x=0.5, y=0.5, showarrow=False)
         fig.update_layout(height=400)
-    st.plotly_chart(fig, config={"displayModeBar": False, "width": None})
+    
+    st.plotly_chart(fig, config={"displayModeBar": False})
 
-    # copy data for display dataframe
-    df_filtered = df_filtered.copy()
-
-    # Calculate difference from previous day for each column
     df_filtered['amount_sell_diff'] = df_filtered['amount_sell'].diff().fillna(0)
     df_filtered['amount_buy_diff'] = df_filtered['amount_buy'].diff().fillna(0)
     df_filtered['difference_diff'] = df_filtered['difference'].diff().fillna(0)
-
-    # order by date descending
     df_filtered = df_filtered.sort_values(by='date', ascending=False)
-
-    # Format date for display
-    df_filtered['date'] = df_filtered['date'].apply(lambda x: x.strftime('%d %B %Y'))
-    # Format columns
-    df_filtered['amount_sell'] = df_filtered['amount_sell'].apply(lambda x: f"{x:,.0f}")
-    df_filtered['amount_buy'] = df_filtered['amount_buy'].apply(lambda x: f"{x:,.0f}")
-    df_filtered['difference'] = df_filtered['difference'].apply(lambda x: f"{x:,.0f}")
-    df_filtered['amount_sell_diff'] = df_filtered['amount_sell_diff'].apply(lambda x: f"{x:,.0f}")
-    df_filtered['amount_buy_diff'] = df_filtered['amount_buy_diff'].apply(lambda x: f"{x:,.0f}")
-    df_filtered['difference_diff'] = df_filtered['difference_diff'].apply(lambda x: f"{x:,.0f}")
-
-    # rename columns for display
-    df_filtered.rename(columns={
-        'date': 'Tanggal',
-        'amount_sell': 'Harga Jual',
-        'amount_buy': 'Harga Beli',
-        'difference': 'Spread',
-        'amount_sell_diff': 'Perubahan Jual',
-        'amount_buy_diff': 'Perubahan Beli',
-        'difference_diff': 'Perubahan Spread'
-    }, inplace=True)
-
-    # reorder columns for display
-    df_filtered = df_filtered[['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']]
-
-    # display dataframe
+    
+    df_display = df_filtered[['date', 'amount_sell', 'amount_sell_diff', 'amount_buy', 'amount_buy_diff', 'difference', 'difference_diff']].copy()
+    df_display['date'] = df_display['date'].apply(lambda x: x.strftime('%d %B %Y'))
+    df_display.columns = ['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']
+    
     st.subheader("Tabel")
-    st.dataframe(df_filtered, hide_index=True)
+    st.dataframe(
+        df_display,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Tanggal": st.column_config.DateColumn("Tanggal", width="small", format="localized"),
+            "Harga Jual": st.column_config.NumberColumn("Harga Jual", width="medium", format="localized"),
+            "Perubahan Jual": st.column_config.NumberColumn("Perubahan Jual", width="small", format="localized"),
+            "Harga Beli": st.column_config.NumberColumn("Harga Beli", width="medium", format="localized"),
+            "Perubahan Beli": st.column_config.NumberColumn("Perubahan Beli", width="small", format="localized"),
+            "Spread": st.column_config.NumberColumn("Spread", width="medium", format="localized"),
+            "Perubahan Spread": st.column_config.NumberColumn("Perubahan Spread", width="small", format="localized"),
+        }
+    )
 
 
-# Tab 2: Simulasi Buyback
 with tab2:
     st.title("Simulasi Buyback")
     st.markdown("Gunakan tabel di bawah ini untuk menghitung estimasi keuntungan/rugi dari buyback emas Anda.")
 
-    # Initialize session state for storing results
     if "buyback_results" not in st.session_state:
         st.session_state.buyback_results = []
 
-    # Last buyback date and price
     last_buyback_date = df_combined['date'].max()
     today_buyback_price = df_combined.loc[df_combined['date'] == last_buyback_date, 'amount_buy'].values[0]
     st.info(f"Harga Buyback Terkini ({last_buyback_date.strftime('%d %B %Y')}): Rp {today_buyback_price:,.0f}")
 
-    # Create a form for user input
     with st.form("buyback_form", clear_on_submit=True):
         st.subheader("Tambah Data Pembelian Emas")
         col1, col2 = st.columns(2)
@@ -192,34 +151,29 @@ with tab2:
             tanggal_beli = st.date_input("Tanggal Beli", value=date.today())
         submitted = st.form_submit_button("Hitung")
 
-    # Process user input after form submission
     if submitted and jumlah_emas > 0:
-        # Get the buy price for the selected date
-        # If the date is not found, use the nearest available date
         tanggal_beli = pd.to_datetime(tanggal_beli).date()
+        
         if tanggal_beli not in df_combined['date'].values:
             nearest_date = df_combined[df_combined['date'] < tanggal_beli]['date'].max()
-            if nearest_date:
-                harga_beli_per_gram = df_combined.loc[df_combined['date'] == nearest_date, 'amount_sell'].values[0]
-                st.warning(f"Tanggal yang dipilih tidak tersedia. Menggunakan harga dari {nearest_date.strftime('%d %B %Y')}.")
-            else:
+            if not nearest_date:
                 st.error("Tanggal yang dipilih tidak tersedia dan tidak ada tanggal sebelumnya.")
                 st.stop()
+            harga_beli_per_gram = df_combined.loc[df_combined['date'] == nearest_date, 'amount_sell'].values[0]
+            st.warning(f"Tanggal yang dipilih tidak tersedia. Menggunakan harga dari {nearest_date.strftime('%d %B %Y')}.")
         else:
             harga_beli_per_gram = df_combined.loc[df_combined['date'] == tanggal_beli, 'amount_sell'].values[0]
-            col1, col2 = st.columns(2)
-            with col1:
-                st.success(f"Harga beli per gram pada {tanggal_beli.strftime('%d %B %Y')}: **Rp {harga_beli_per_gram:,.0f}**")
-            with col2:
-                st.success(f"Total harga beli: **Rp {jumlah_emas * harga_beli_per_gram:,.0f}**")
         
-        # Calculate total buy and sell prices
-        harga_beli_per_gram = float(harga_beli_per_gram)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.success(f"Harga beli per gram pada {tanggal_beli.strftime('%d %B %Y')}: **Rp {harga_beli_per_gram:,.0f}**")
+        with col2:
+            st.success(f"Total harga beli: **Rp {jumlah_emas * harga_beli_per_gram:,.0f}**")
+        
         harga_beli_total = jumlah_emas * harga_beli_per_gram
         harga_jual_total = jumlah_emas * today_buyback_price
         keuntungan_rugi = harga_jual_total - harga_beli_total
 
-        # Append the result to session state
         st.session_state.buyback_results.append({
             "Jumlah Emas (gram)": jumlah_emas,
             "Tanggal Beli": tanggal_beli,
@@ -232,65 +186,42 @@ with tab2:
     elif submitted:
         st.warning("Masukkan jumlah emas yang valid untuk menghitung.")
 
-    # Display all results
     if st.session_state.buyback_results:
         st.subheader("Hasil Simulasi")
         result_data = pd.DataFrame(st.session_state.buyback_results)
-        result_data.index += 1  # Increment the index for display
+        result_data.index += 1
 
-        # Compute totals before any formatting
         total_emas = result_data['Jumlah Emas (gram)'].sum()
         total_harga_beli = result_data['Total Harga Beli (Rp)'].sum()
         total_harga_jual = result_data['Total Harga Jual (Rp)'].sum()
         total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].sum()
-        total_investment = total_harga_beli
-        profit_loss_percentage = (total_profit_loss / total_investment) * 100 if total_investment > 0 else 0
+        profit_loss_percentage = (total_profit_loss / total_harga_beli) * 100 if total_harga_beli > 0 else 0
 
-        # Prepare a formatted copy for display only
-        display_data = result_data.copy()
-        display_data['Tanggal Beli'] = pd.to_datetime(display_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
-        display_data['Jumlah Emas (gram)'] = display_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
-        display_data['Harga Beli per Gram (Rp)'] = display_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
-        display_data['Total Harga Beli (Rp)'] = display_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
-        display_data['Total Harga Jual (Rp)'] = display_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
-        display_data['Keuntungan/Rugi (Rp)'] = display_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
-
-        # Display the formatted table with styling
-        styled_data = display_data.style.set_properties(**{
-            'text-align': 'center'
-        }).set_properties(subset=['Harga Beli per Gram (Rp)', 'Total Harga Beli (Rp)', 
-                                   'Total Harga Jual (Rp)', 'Keuntungan/Rugi (Rp)'], **{
-            'text-align': 'right'
-        }).set_table_styles([
-            {'selector': 'th', 'props': [('text-align', 'center')]}
-        ])
-        st.dataframe(styled_data)
+        st.dataframe(
+            result_data,
+            use_container_width=True,
+            column_config={
+                "Jumlah Emas (gram)": st.column_config.NumberColumn("Jumlah Emas (gram)", width="small", format="localized"),
+                "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", width="small", format="localized"),
+                "Harga Beli per Gram (Rp)": st.column_config.NumberColumn("Harga Beli per Gram (Rp)", width="medium", format="localized"),
+                "Total Harga Beli (Rp)": st.column_config.NumberColumn("Total Harga Beli (Rp)", width="medium", format="localized"),
+                "Total Harga Jual (Rp)": st.column_config.NumberColumn("Total Harga Jual (Rp)", width="medium", format="localized"),
+                "Keuntungan/Rugi (Rp)": st.column_config.NumberColumn("Keuntungan/Rugi (Rp)", width="medium", format="localized"),
+            }
+        )
 
         col1, col2 = st.columns(2)
         with col1:
-            st.info(f"""
-            **Total Emas**: {total_emas:,.1f} gram  
-            **Total Harga Beli**: Rp {total_harga_beli:,.0f}
-            """)
+            st.info(f"**Total Emas**: {total_emas:,.1f} gram\n\n**Total Harga Beli**: Rp {total_harga_beli:,.0f}")
         with col2:
             if total_profit_loss >= 0:
-                st.success(f"""
-                **Total Keuntungan**: Rp {total_profit_loss:,.0f}  
-                **Total Persentase Keuntungan**: {profit_loss_percentage:.2f}%
-                """)
+                st.success(f"**Total Keuntungan**: Rp {total_profit_loss:,.0f}\n\n**Persentase**: {profit_loss_percentage:.2f}%")
             else:
-                st.error(f"""
-                **Total Rugi**: Rp {total_profit_loss:,.0f}  
-                **Total Persentase Rugi**: {profit_loss_percentage:.2f}%
-                """)
+                st.error(f"**Total Rugi**: Rp {total_profit_loss:,.0f}\n\n**Persentase**: {profit_loss_percentage:.2f}%")
 
-        # Add a reset button
         if st.button("Reset Data"):
-            # Reset specific session state variables
-            if "buyback_results" in st.session_state:
-                st.session_state.buyback_results = []
+            st.session_state.buyback_results = []
 
-    # Display disclaimer
         st.markdown("""
         ---
         **Disclaimer**: 
@@ -300,5 +231,4 @@ with tab2:
         - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
         """)
 
-# Show info at the very bottom of the page
 st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')}")
