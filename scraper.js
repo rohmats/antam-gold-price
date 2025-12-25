@@ -66,14 +66,14 @@ async function scrapeSellData(page, token, transitionDate) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    // Read existing data from gold-latest.json
-    const latestFile = path.join(dataDir, 'gold-latest.json');
+    // Read existing data from antam_sell.json in parent folder
+    const parentFile = path.join(__dirname, 'antam_sell.json');
     let existing = [];
-    if (fs.existsSync(latestFile)) {
+    if (fs.existsSync(parentFile)) {
       try {
-        existing = JSON.parse(fs.readFileSync(latestFile, 'utf-8'));
+        existing = JSON.parse(fs.readFileSync(parentFile, 'utf-8'));
       } catch (e) {
-        console.warn('⚠️ Gagal baca gold-latest.json:', e.message);
+        console.warn('⚠️ Gagal baca antam_sell.json:', e.message);
       }
     }
 
@@ -96,11 +96,7 @@ async function scrapeSellData(page, token, transitionDate) {
     const filename = path.join(dataDir, `gold-sell-${transitionDate}.json`);
     fs.writeFileSync(filename, JSON.stringify(filtered, null, 2));
 
-    // Save latest version
-    fs.writeFileSync(latestFile, JSON.stringify(filtered, null, 2));
-
     // Update parent folder antam_sell.json
-    const parentFile = path.join(__dirname, 'antam_sell.json');
     fs.writeFileSync(parentFile, JSON.stringify(filtered, null, 2));
 
     console.log(`💾 Sell data disimpan ke ${filename} dan antam_sell.json (total ${filtered.length} data)`);
@@ -138,14 +134,14 @@ async function scrapeBuyData(page, token, transitionDate) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    // Read existing data from gold-latest.json
-    const latestFile = path.join(dataDir, 'gold-latest.json');
+    // Read existing data from antam_buy.json in parent folder
+    const parentFile = path.join(__dirname, 'antam_buy.json');
     let existing = [];
-    if (fs.existsSync(latestFile)) {
+    if (fs.existsSync(parentFile)) {
       try {
-        existing = JSON.parse(fs.readFileSync(latestFile, 'utf-8'));
+        existing = JSON.parse(fs.readFileSync(parentFile, 'utf-8'));
       } catch (e) {
-        console.warn('⚠️ Gagal baca gold-latest.json:', e.message);
+        console.warn('⚠️ Gagal baca antam_buy.json:', e.message);
       }
     }
 
@@ -168,11 +164,7 @@ async function scrapeBuyData(page, token, transitionDate) {
     const filename = path.join(dataDir, `gold-buy-${transitionDate}.json`);
     fs.writeFileSync(filename, JSON.stringify(filtered, null, 2));
 
-    // Save latest version
-    fs.writeFileSync(latestFile, JSON.stringify(filtered, null, 2));
-
     // Update parent folder antam_buy.json
-    const parentFile = path.join(__dirname, 'antam_buy.json');
     fs.writeFileSync(parentFile, JSON.stringify(filtered, null, 2));
 
     console.log(`💾 Buy data disimpan ke ${filename} dan antam_buy.json (total ${filtered.length} data)`);
