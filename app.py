@@ -199,7 +199,6 @@ with tab2:
 
         st.dataframe(
             result_data,
-            use_container_width=True,
             column_config={
                 "Jumlah Emas (gram)": st.column_config.NumberColumn("Jumlah Emas (gram)", width="small", format="localized"),
                 "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", width="medium", format="localized"),
