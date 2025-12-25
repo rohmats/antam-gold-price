@@ -168,6 +168,9 @@ with tab1:
                                  fill='tozeroy', line=dict(color='#2ECC40'), hovertemplate='%{y:,.0f}<extra></extra>'))
         fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['difference'], mode='lines', name='Selisih',
                                  line=dict(color='#0074D9'), yaxis='y2', hovertemplate='%{y:,.0f}<extra></extra>'))
+        # Determine Y-axis min and max based on filtered data
+        y_min = min(df_filtered['amount_sell'].min(), df_filtered['amount_buy'].min()) - 50000
+        y_max = max(df_filtered['amount_sell'].max(), df_filtered['amount_buy'].max()) + 50000
         fig.update_layout(
             title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Tanggal',
@@ -178,7 +181,8 @@ with tab1:
             ),
             yaxis=dict(
                 separatethousands=True,
-                showgrid=False
+                showgrid=False,
+                range=[y_min, y_max]
             ),
             yaxis2=dict(
                 title='Selisih (Rp)',
