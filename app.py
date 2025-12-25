@@ -118,7 +118,6 @@ with tab1:
     st.dataframe(
         df_display,
         hide_index=True,
-        use_container_width=True,
         column_config={
             "Tanggal": st.column_config.DateColumn("Tanggal", width="medium", format="localized"),
             "Harga Jual": st.column_config.NumberColumn("Harga Jual", width="medium", format="localized"),
