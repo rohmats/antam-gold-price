@@ -120,7 +120,7 @@ with tab1:
         hide_index=True,
         use_container_width=True,
         column_config={
-            "Tanggal": st.column_config.DateColumn("Tanggal", width="small", format="localized"),
+            "Tanggal": st.column_config.DateColumn("Tanggal", width="medium", format="localized"),
             "Harga Jual": st.column_config.NumberColumn("Harga Jual", width="medium", format="localized"),
             "Perubahan Jual": st.column_config.NumberColumn("Perubahan Jual", width="small", format="localized"),
             "Harga Beli": st.column_config.NumberColumn("Harga Beli", width="medium", format="localized"),
@@ -202,7 +202,7 @@ with tab2:
             use_container_width=True,
             column_config={
                 "Jumlah Emas (gram)": st.column_config.NumberColumn("Jumlah Emas (gram)", width="small", format="localized"),
-                "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", width="small", format="localized"),
+                "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", width="medium", format="localized"),
                 "Harga Beli per Gram (Rp)": st.column_config.NumberColumn("Harga Beli per Gram (Rp)", width="medium", format="localized"),
                 "Total Harga Beli (Rp)": st.column_config.NumberColumn("Total Harga Beli (Rp)", width="medium", format="localized"),
                 "Total Harga Jual (Rp)": st.column_config.NumberColumn("Total Harga Jual (Rp)", width="medium", format="localized"),
