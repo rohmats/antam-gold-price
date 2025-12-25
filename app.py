@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import requests
 from plotly import graph_objects as go
 from plotly import io as pio
 import json
@@ -28,93 +27,20 @@ def process_json_to_dataframe(data):
     df['amount'] = pd.to_numeric(df['amount'])
     return df
 
-# Function to fetch data from APIs or load local files
 @st.cache_data
-def fetch_data():
-    headers = {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'accept-language': 'id,en-US;q=0.9,en;q=0.8,en-GB;q=0.7',
-        'cache-control': 'max-age=0',
-        'dnt': '1',
-        'priority': 'u=0, i',
-        'sec-ch-ua': '"Microsoft Edge";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'document',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-site': 'cross-site',
-        'sec-fetch-user': '?1',
-        'sec-gpc': '1',
-        'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
-    }
+def load_local_data():
     try:
-        buy_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-buy", timeout=10, headers=headers)
-        sell_response = requests.get("https://hargaemas.vercel.app/api/price-gold-antam-sell", timeout=10, headers=headers)
-        buy_response.raise_for_status()
-        sell_response.raise_for_status()
-        sell_data = sell_response.json()
-        buy_data = buy_response.json()
-        # Update local files
-        with open('antam_sell.json', 'w', encoding='utf-8') as f:
-            json.dump(sell_data, f)
-        with open('antam_buy.json', 'w', encoding='utf-8') as f:
-            json.dump(buy_data, f)
-        # Update files in GitHub repo using GitHub API (works on any platform)
-        import base64
-        def update_github_file(repo, path, content, commit_message, token):
-            url = f"https://api.github.com/repos/{repo}/contents/{path}"
-            headers = {"Authorization": f"token {token}"}
-            r = requests.get(url, headers=headers)
-            sha = r.json().get("sha")
-            data = {
-                "message": commit_message,
-                "content": base64.b64encode(content.encode()).decode(),
-                "sha": sha
-            }
-            response = requests.put(url, headers=headers, json=data)
-            return response.status_code, response.json()
+        with open('antam_sell.json', 'r', encoding='utf-8') as f:
+            sell_data = json.load(f)
+        with open('antam_buy.json', 'r', encoding='utf-8') as f:
+            buy_data = json.load(f)
+        return sell_data, buy_data
+    except FileNotFoundError:
+        st.error("File antam_sell.json atau antam_buy.json tidak ditemukan. Pastikan scraper sudah berjalan.")
+        st.stop()
 
-        # Get token from Streamlit app settings
-        github_token = st.secrets["GITHUB_TOKEN"] if "GITHUB_TOKEN" in st.secrets else None
-        github_repo = "rohmats/antam-gold-price"
-        if github_token:
-            status_buy, result_buy = update_github_file(
-                repo=github_repo,
-                path="antam_buy.json",
-                content=json.dumps(buy_data),
-                commit_message="Update antam_buy data from API",
-                token=github_token
-            )
-            status_sell, result_sell = update_github_file(
-                repo=github_repo,
-                path="antam_sell.json",
-                content=json.dumps(sell_data),
-                commit_message="Update antam_sell data from API",
-                token=github_token
-            )
-            if status_buy == 200 and status_sell == 200:
-                # Set a flag to show success at the bottom
-                st.session_state.github_update_success = True
-            else:
-                st.session_state.github_update_success = False
-                st.session_state.github_update_error = f"GitHub API update failed: {result_buy.get('message', '')} {result_sell.get('message', '')}"
-        else:
-            st.info("GitHub token not found in Streamlit app settings. JSON files only updated locally.")
-        return sell_data, buy_data, None
-    except (requests.RequestException, json.JSONDecodeError) as error:
-        try:
-            with open('antam_sell.json', 'r', encoding='utf-8') as f:
-                sell_data_local = json.load(f)
-            with open('antam_buy.json', 'r', encoding='utf-8') as f:
-                buy_data_local = json.load(f)
-            return sell_data_local, buy_data_local, error
-        except FileNotFoundError:
-            st.error("Local data files not found. Exiting.")
-            st.stop()
-
-# Fetch and process data
-sell, buy, e = fetch_data()
+# Fetch and process data (local files maintained by GitHub Actions scraper)
+sell, buy = load_local_data()
 df_sell = process_json_to_dataframe(sell)
 df_buy = process_json_to_dataframe(buy)
 
@@ -123,6 +49,7 @@ df_combined = pd.merge(df_sell, df_buy, on='date', how='outer', suffixes=('_sell
 df_combined['date'] = df_combined['date']
 df_combined['difference'] = df_combined['amount_sell'] - df_combined['amount_buy']
 df_combined = df_combined.drop_duplicates(subset=['date'], keep='last')
+df_combined = df_combined.sort_values('date')
 
 # Add tabs for different sections
 tab1, tab2 = st.tabs(["Harga Emas", "Simulasi Buyback"])
@@ -135,8 +62,8 @@ with tab1:
         """
         Aplikasi ini dibuat dari keresahan pribadi: ribet saat mengecek harga emas karena harus membuka beberapa halaman. 
         Aplikasi ringkas ini menyatukan harga jual dan beli dalam satu grafik dan tabel agar lebih cepat dibandingkan. 
-        Sumber data: [Logam Mulia - Antam](https://logammulia.com). Terinspirasi oleh proyek [ferryops](https://hargaemas.vercel.app/).
         Tersedia juga fitur Simulasi Buyback untuk menghitung perkiraan keuntungan atau kerugian dari buyback emas Anda.
+        Sumber data: [Logam Mulia - Antam](https://logammulia.com).
         """
     )
     # Dropdown for relative date options
@@ -160,8 +87,8 @@ with tab1:
     df_filtered = df_combined[(df_combined['date'] >= start_date) & (df_combined['date'] <= end_date)]
 
     # Plotly chart
+    fig = go.Figure()
     if not df_filtered.empty:
-        fig = go.Figure()
         fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['amount_sell'], mode='lines', name='Jual',
                                  fill='tozeroy', line=dict(color='#FF4136'), hovertemplate='%{y:,.0f}<extra></extra>'))
         fig.add_trace(go.Scatter(x=df_filtered['date'], y=df_filtered['amount_buy'], mode='lines', name='Beli',
@@ -196,6 +123,9 @@ with tab1:
             height=600
         )
         st.subheader("Grafik")
+    else:
+        fig.add_annotation(text="Tidak ada data untuk rentang ini", xref="paper", yref="paper", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(height=400)
     st.plotly_chart(fig, config={"displayModeBar": False, "width": None})
 
     # copy data for display dataframe
@@ -236,16 +166,6 @@ with tab1:
     # display dataframe
     st.subheader("Tabel")
     st.dataframe(df_filtered, hide_index=True)
-
-    # Notes and API status
-    st.subheader("Catatan")
-    st.markdown("""
-    - Data diambil dari API dan disimpan secara lokal.
-    - Jika API tidak dapat diakses, data lokal akan digunakan.
-    - Data ditampilkan dalam format tabel dan grafik.
-    """)
-    # ...existing code...
-
 
 
 # Tab 2: Simulasi Buyback
@@ -317,24 +237,34 @@ with tab2:
         st.subheader("Hasil Simulasi")
         result_data = pd.DataFrame(st.session_state.buyback_results)
         result_data.index += 1  # Increment the index for display
-        # format date for display
-        result_data['Tanggal Beli'] = pd.to_datetime(result_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
-        # Format numerical columns
-        result_data['Jumlah Emas (gram)'] = result_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
-        result_data['Harga Beli per Gram (Rp)'] = result_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
-        result_data['Total Harga Beli (Rp)'] = result_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
-        result_data['Total Harga Jual (Rp)'] = result_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
-        result_data['Keuntungan/Rugi (Rp)'] = result_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
 
-        # Display the formatted table
-        st.dataframe(result_data)
-        # Total calculations
-        total_emas = result_data['Jumlah Emas (gram)'].astype(float).sum()
-        total_harga_beli = result_data['Total Harga Beli (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
-        total_harga_jual = result_data['Total Harga Jual (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
-        total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].str.replace('Rp ', '').str.replace(',', '').astype(float).sum()
+        # Compute totals before any formatting
+        total_emas = result_data['Jumlah Emas (gram)'].sum()
+        total_harga_beli = result_data['Total Harga Beli (Rp)'].sum()
+        total_harga_jual = result_data['Total Harga Jual (Rp)'].sum()
+        total_profit_loss = result_data['Keuntungan/Rugi (Rp)'].sum()
         total_investment = total_harga_beli
         profit_loss_percentage = (total_profit_loss / total_investment) * 100 if total_investment > 0 else 0
+
+        # Prepare a formatted copy for display only
+        display_data = result_data.copy()
+        display_data['Tanggal Beli'] = pd.to_datetime(display_data['Tanggal Beli']).dt.strftime('%d-%m-%Y')
+        display_data['Jumlah Emas (gram)'] = display_data['Jumlah Emas (gram)'].apply(lambda x: f"{x:,.1f}")
+        display_data['Harga Beli per Gram (Rp)'] = display_data['Harga Beli per Gram (Rp)'].apply(lambda x: f"{x:,.0f}")
+        display_data['Total Harga Beli (Rp)'] = display_data['Total Harga Beli (Rp)'].apply(lambda x: f"{x:,.0f}")
+        display_data['Total Harga Jual (Rp)'] = display_data['Total Harga Jual (Rp)'].apply(lambda x: f"{x:,.0f}")
+        display_data['Keuntungan/Rugi (Rp)'] = display_data['Keuntungan/Rugi (Rp)'].apply(lambda x: f"{x:,.0f}")
+
+        # Display the formatted table with styling
+        styled_data = display_data.style.set_properties(**{
+            'text-align': 'center'
+        }).set_properties(subset=['Harga Beli per Gram (Rp)', 'Total Harga Beli (Rp)', 
+                                   'Total Harga Jual (Rp)', 'Keuntungan/Rugi (Rp)'], **{
+            'text-align': 'right'
+        }).set_table_styles([
+            {'selector': 'th', 'props': [('text-align', 'center')]}
+        ])
+        st.dataframe(styled_data)
 
         col1, col2 = st.columns(2)
         with col1:
@@ -370,20 +300,5 @@ with tab2:
         - Pastikan untuk memverifikasi harga terkini sebelum melakukan transaksi.
         """)
 
-# Show info and success/error at the very bottom of the page
-st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')} menggunakan {'data lokal' if e else 'data dari API'}.")
-st.subheader("Status API")
-st.markdown("""
-- API menggunakan [logam-mulia API](https://hargaemas.vercel.app/) yang dibuat oleh [ferryops](https://github.com/ferryops/logam-mulia).
-""")
-if e:
-    st.error(f"Terjadi kesalahan saat mengambil data dari API: \n {e}")
-else:
-    st.success("Data berhasil diambil dari API.")
-
-# Show GitHub update status at the bottom
-if 'github_update_success' in st.session_state:
-    if st.session_state.github_update_success:
-        st.success("JSON files updated in GitHub repository.")
-    elif 'github_update_error' in st.session_state:
-        st.warning(st.session_state.github_update_error)
+# Show info at the very bottom of the page
+st.info(f"Data terakhir diperbarui pada: {df_combined['date'].max().strftime('%d %B %Y')}")
