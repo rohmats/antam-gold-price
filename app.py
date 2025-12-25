@@ -108,11 +108,12 @@ with tab1:
     df_filtered['amount_sell_diff'] = df_filtered['amount_sell'].diff().fillna(0)
     df_filtered['amount_buy_diff'] = df_filtered['amount_buy'].diff().fillna(0)
     df_filtered['difference_diff'] = df_filtered['difference'].diff().fillna(0)
+    df_filtered['percent_spread'] = (df_filtered['difference'] / df_filtered['amount_sell']) * 100
     df_filtered = df_filtered.sort_values(by='date', ascending=False)
     
-    df_display = df_filtered[['date', 'amount_sell', 'amount_sell_diff', 'amount_buy', 'amount_buy_diff', 'difference', 'difference_diff']].copy()
+    df_display = df_filtered[['date', 'amount_sell', 'amount_sell_diff', 'amount_buy', 'amount_buy_diff', 'difference', 'difference_diff', 'percent_spread']].copy()
     df_display['date'] = df_display['date'].apply(lambda x: x.strftime('%d %B %Y'))
-    df_display.columns = ['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread']
+    df_display.columns = ['Tanggal', 'Harga Jual', 'Perubahan Jual', 'Harga Beli', 'Perubahan Beli', 'Spread', 'Perubahan Spread', 'Persentase Spread']
     
     st.subheader("Tabel")
     st.dataframe(
@@ -126,6 +127,7 @@ with tab1:
             "Perubahan Beli": st.column_config.NumberColumn("Perubahan Beli", format="localized"),
             "Spread": st.column_config.NumberColumn("Spread", format="localized"),
             "Perubahan Spread": st.column_config.NumberColumn("Perubahan Spread", format="localized"),
+            "Persentase Spread": st.column_config.NumberColumn("Persentase Spread", format="%.2f%%"),
         }
     )
 
