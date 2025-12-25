@@ -119,13 +119,13 @@ with tab1:
         df_display,
         hide_index=True,
         column_config={
-            "Tanggal": st.column_config.DateColumn("Tanggal", width="medium", format="localized"),
-            "Harga Jual": st.column_config.NumberColumn("Harga Jual", width="medium", format="localized"),
-            "Perubahan Jual": st.column_config.NumberColumn("Perubahan Jual", width="small", format="localized"),
-            "Harga Beli": st.column_config.NumberColumn("Harga Beli", width="medium", format="localized"),
-            "Perubahan Beli": st.column_config.NumberColumn("Perubahan Beli", width="small", format="localized"),
-            "Spread": st.column_config.NumberColumn("Spread", width="medium", format="localized"),
-            "Perubahan Spread": st.column_config.NumberColumn("Perubahan Spread", width="small", format="localized"),
+            "Tanggal": st.column_config.DateColumn("Tanggal", format="localized"),
+            "Harga Jual": st.column_config.NumberColumn("Harga Jual", format="localized"),
+            "Perubahan Jual": st.column_config.NumberColumn("Perubahan Jual", format="localized"),
+            "Harga Beli": st.column_config.NumberColumn("Harga Beli", format="localized"),
+            "Perubahan Beli": st.column_config.NumberColumn("Perubahan Beli", format="localized"),
+            "Spread": st.column_config.NumberColumn("Spread", format="localized"),
+            "Perubahan Spread": st.column_config.NumberColumn("Perubahan Spread", format="localized"),
         }
     )
 
@@ -199,12 +199,12 @@ with tab2:
         st.dataframe(
             result_data,
             column_config={
-                "Jumlah Emas (gram)": st.column_config.NumberColumn("Jumlah Emas (gram)", width="small", format="localized"),
-                "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", width="medium", format="localized"),
-                "Harga Beli per Gram (Rp)": st.column_config.NumberColumn("Harga Beli per Gram (Rp)", width="medium", format="localized"),
-                "Total Harga Beli (Rp)": st.column_config.NumberColumn("Total Harga Beli (Rp)", width="medium", format="localized"),
-                "Total Harga Jual (Rp)": st.column_config.NumberColumn("Total Harga Jual (Rp)", width="medium", format="localized"),
-                "Keuntungan/Rugi (Rp)": st.column_config.NumberColumn("Keuntungan/Rugi (Rp)", width="medium", format="localized"),
+                "Jumlah Emas (gram)": st.column_config.NumberColumn("Jumlah Emas (gram)", format="localized"),
+                "Tanggal Beli": st.column_config.DateColumn("Tanggal Beli", format="localized"),
+                "Harga Beli per Gram (Rp)": st.column_config.NumberColumn("Harga Beli per Gram (Rp)", format="localized"),
+                "Total Harga Beli (Rp)": st.column_config.NumberColumn("Total Harga Beli (Rp)", format="localized"),
+                "Total Harga Jual (Rp)": st.column_config.NumberColumn("Total Harga Jual (Rp)", format="localized"),
+                "Keuntungan/Rugi (Rp)": st.column_config.NumberColumn("Keuntungan/Rugi (Rp)", format="localized"),
             }
         )
 
