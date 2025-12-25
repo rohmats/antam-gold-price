@@ -93,7 +93,7 @@ async function scrapeSellData(page, token, transitionDate) {
     filtered.sort((a, b) => a[0] - b[0]);
 
     // Save daily archive
-    const filename = path.join(dataDir, `gold-${transitionDate}.json`);
+    const filename = path.join(dataDir, `gold-sell-${transitionDate}.json`);
     fs.writeFileSync(filename, JSON.stringify(filtered, null, 2));
 
     // Save latest version
@@ -165,7 +165,7 @@ async function scrapeBuyData(page, token, transitionDate) {
     filtered.sort((a, b) => a[0] - b[0]);
 
     // Save daily archive
-    const filename = path.join(dataDir, `gold-${transitionDate}.json`);
+    const filename = path.join(dataDir, `gold-buy-${transitionDate}.json`);
     fs.writeFileSync(filename, JSON.stringify(filtered, null, 2));
 
     // Save latest version
