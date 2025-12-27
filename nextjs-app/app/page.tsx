@@ -359,22 +359,7 @@ export default function Home() {
               </div>
             </div>
 
-            {rangeChange && (
-              <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
-                  <span className="font-semibold text-foreground">Harga Jual:</span>
-                  <span className={rangeChange.sellPct && rangeChange.sellPct > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
-                    {rangeChange.sellPct !== null ? `${rangeChange.sellPct > 0 ? "↑" : rangeChange.sellPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.sellPct).toFixed(2)}%` : "n/a"}
-                  </span>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
-                  <span className="font-semibold text-foreground">Harga Beli:</span>
-                  <span className={rangeChange.buyPct && rangeChange.buyPct > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
-                    {rangeChange.buyPct !== null ? `${rangeChange.buyPct > 0 ? "↑" : rangeChange.buyPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.buyPct).toFixed(2)}%` : "n/a"}
-                  </span>
-                </span>
-              </div>
-            )}
+            {/* Removed duplicate percentage badges below the chart header */}
 
             {dateRange === "custom" && (
               <fieldset className="rounded-lg border border-border/80 bg-muted/30 p-3 sm:p-4 space-y-3">
