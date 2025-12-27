@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/python-3
 {
-	"name": "Antam Gold Price",
+	"name": "ANTAM Gold Price",
 	"image": "mcr.microsoft.com/devcontainers/python:3.9", // Use a Python 3.9 image
 	"customizations": {
 		"codespaces": {

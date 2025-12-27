@@ -6,7 +6,7 @@ import json
 from datetime import date, timedelta
 
 st.set_page_config(
-    page_title="Harga Emas Antam",
+    page_title="Harga Emas ANTAM",
     page_icon=":bar_chart:",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -51,13 +51,13 @@ tab1, tab2 = st.tabs(["Harga Emas", "Simulasi Buyback"])
 
 # Tab 1: Harga Emas (existing content)
 with tab1:
-    st.title("Harga Emas Antam")
+    st.title("Harga Emas ANTAM")
     st.markdown(
         """
         Aplikasi ini dibuat dari keresahan pribadi: ribet saat mengecek harga emas karena harus membuka beberapa halaman. 
         Aplikasi ringkas ini menyatukan harga jual dan beli dalam satu grafik dan tabel agar lebih cepat dibandingkan. 
         Tersedia juga fitur Simulasi Buyback untuk menghitung perkiraan keuntungan atau kerugian dari buyback emas Anda.
-        Sumber data: [Logam Mulia - Antam](https://logammulia.com).
+        Sumber data: [Logam Mulia - ANTAM](https://logammulia.com).
         """
     )
     
@@ -88,7 +88,7 @@ with tab1:
         y_max = max(df_filtered['amount_sell'].max(), df_filtered['amount_buy'].max()) + 50000
         
         fig.update_layout(
-            title=dict(text="Harga Jual, Beli, dan Selisih Emas Antam", font=dict(size=16), x=0.5, xanchor='center'),
+            title=dict(text="Harga Jual, Beli, dan Selisih Emas ANTAM", font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Tanggal',
             yaxis_title='Harga (Rp)',
             xaxis=dict(showgrid=False, tickformat='%d %b %Y'),

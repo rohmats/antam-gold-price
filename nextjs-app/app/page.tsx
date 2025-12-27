@@ -189,7 +189,7 @@ export default function Home() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
-            Harga Emas Antam
+            Harga Emas ANTAM
           </h1>
           <p className="text-muted-foreground">
             Pantau harga jual, beli, dan spread emas ANTAM secara real-time
@@ -209,7 +209,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Logam Mulia - Antam
+                  Logam Mulia - ANTAM
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>

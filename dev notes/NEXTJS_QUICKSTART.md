@@ -91,12 +91,12 @@ nextjs-app/
 
 ### Home Page (`/`)
 1. **Header & Description**
-   - Title: Harga Emas Antam
+   - Title: Harga Emas ANTAM
    - Subtitle: Monitor prices in real-time
 
 2. **Data Source Alert**
    - Shows last update date
-   - Links to Logam Mulia - Antam
+   - Links to Logam Mulia - ANTAM
 
 3. **Quick Stats (4 Cards)**
    - Current sell price (red)

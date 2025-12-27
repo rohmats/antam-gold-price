@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Harga Emas Antam",
+  title: "Harga Emas ANTAM",
   description: "Aplikasi untuk melihat harga emas ANTAM dan simulasi buyback",
   icons: {
     icon: "/favicon.ico",

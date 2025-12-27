@@ -1,12 +1,12 @@
-# Harga Emas Antam
+# Harga Emas ANTAM
 
-Aplikasi Streamlit untuk memvisualisasikan harga jual, beli, dan selisih harga emas Antam dengan web scraper otomatis dari situs [logammulia.com](https://www.logammulia.com/).
+Aplikasi Streamlit untuk memvisualisasikan harga jual, beli, dan selisih harga emas ANTAM dengan web scraper otomatis dari situs [logammulia.com](https://www.logammulia.com/).
 
 ## Fitur
 
-- **Web Scraper Otomatis**: Mengumpulkan data harga jual dan beli emas Antam langsung dari logammulia.com menggunakan Puppeteer
+- **Web Scraper Otomatis**: Mengumpulkan data harga jual dan beli emas ANTAM langsung dari logammulia.com menggunakan Puppeteer
 - **Penjadwalan Otomatis**: GitHub Actions menjalankan scraper 3x sehari (00:00, 08:00, 16:00 UTC)
-- **Grafik Interaktif**: Menampilkan grafik harga jual, beli, dan selisih harga emas Antam.
+- **Grafik Interaktif**: Menampilkan grafik harga jual, beli, dan selisih harga emas ANTAM.
 - **Tabel Data**: Menampilkan data harga dalam format tabel dengan format Rupiah.
 - **Filter Rentang Tanggal**: Memungkinkan pengguna untuk memilih rentang tanggal data yang ingin ditampilkan.
 - **Fallback Data Lokal**: Jika scraper gagal, aplikasi akan menggunakan data lokal yang telah disimpan sebelumnya.
