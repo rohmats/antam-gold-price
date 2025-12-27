@@ -156,28 +156,29 @@ export function PriceChart({ data }: PriceChartProps) {
 
   // Calculate tick interval for X-axis to avoid dense labels
   const dataLength = chartData.length;
-  let tickInterval = 0;
-  
-  if (dataLength > 365) {
-    tickInterval = Math.floor(dataLength / 12); // ~12 labels for very long periods
-  } else if (dataLength > 180) {
-    tickInterval = Math.floor(dataLength / 10); // ~10 labels for 6+ months
-  } else if (dataLength > 90) {
-    tickInterval = Math.floor(dataLength / 8); // ~8 labels for 3+ months
-  } else if (dataLength > 30) {
-    tickInterval = Math.floor(dataLength / 6); // ~6 labels for 1+ month
-  } else if (dataLength > 7) {
-    tickInterval = Math.floor(dataLength / 5); // ~5 labels for 1+ week
-  } else {
-    tickInterval = 1; // Show all labels for very short periods
-  }
+  const targetTicks =
+    dataLength <= 7
+      ? dataLength
+      : dataLength <= 30
+        ? 5
+        : dataLength <= 90
+          ? 6
+          : dataLength <= 180
+            ? 8
+            : dataLength <= 365
+              ? 10
+              : 12;
+  const tickInterval = Math.max(1, Math.ceil(dataLength / targetTicks)) - 1;
 
   return (
     <ChartContainer
       config={chartConfig}
-      className="w-full h-[320px] sm:h-[380px] md:h-[420px]"
+      className="w-full h-[280px] sm:h-[340px] md:h-[420px]"
     >
-      <ComposedChart data={chartData}>
+      <ComposedChart
+        data={chartData}
+        margin={{ top: 12, right: 4, left: 4, bottom: 0 }}
+      >
         <CartesianGrid
           strokeDasharray="3 3"
           vertical={false}
@@ -187,16 +188,16 @@ export function PriceChart({ data }: PriceChartProps) {
           dataKey="date"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-xs"
+          tickMargin={4}
+          className="text-[10px] sm:text-[11px]"
           interval={tickInterval}
         />
         <YAxis
           yAxisId="left"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-xs"
+          tickMargin={4}
+          className="text-[10px] sm:text-[11px]"
           tickFormatter={(value) => `${(value / 1000000).toFixed(1)}jt`}
           domain={[minPrice - pricePadding, maxPrice + pricePadding]}
         />
@@ -205,8 +206,8 @@ export function PriceChart({ data }: PriceChartProps) {
           orientation="right"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-xs"
+          tickMargin={4}
+          className="text-[10px] sm:text-[11px]"
           tickFormatter={(value) => `${(value / 1000).toFixed(0)}rb`}
           domain={[minSpread - spreadPadding, maxSpread + spreadPadding]}
         />

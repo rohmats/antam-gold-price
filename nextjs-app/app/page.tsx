@@ -22,13 +22,15 @@ import {
 } from "@/lib/gold-data";
 import { AlertCircle } from "lucide-react";
 
-type DateRange = "7" | "30" | "180" | "365" | "all";
+type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "all" | "custom";
 
 export default function Home() {
   const [data, setData] = useState<GoldData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>("365");
+  const [dateRange, setDateRange] = useState<DateRange>("180");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -58,15 +60,92 @@ export default function Home() {
 
   const daysMap: Record<DateRange, number | null> = {
     "7": 7,
+    "14": 14,
     "30": 30,
+    "90": 90,
     "180": 180,
     "365": 365,
+    "730": 730,
     all: null,
+    custom: null,
   };
 
   const filteredData = useMemo(() => {
-    return filterByDateRange(data, daysMap[dateRange]);
-  }, [data, dateRange]);
+    const rangeDays = dateRange === "custom" ? null : daysMap[dateRange];
+    let base = filterByDateRange(data, rangeDays);
+
+    if (dateRange === "custom") {
+      if (fromDate) {
+        const from = new Date(fromDate);
+        base = base.filter((item) => item.date >= from);
+      }
+      if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        base = base.filter((item) => item.date <= to);
+      }
+    }
+    return base;
+  }, [data, dateRange, fromDate, toDate]);
+
+  const applyPreset = (value: DateRange) => {
+    setDateRange(value);
+
+    if (value === "custom") {
+      return;
+    }
+
+    const days = daysMap[value];
+    if (days === null) {
+      setFromDate("");
+      setToDate("");
+      return;
+    }
+
+    if (!data.length) {
+      setFromDate("");
+      setToDate("");
+      return;
+    }
+
+    const latest = new Date(Math.max(...data.map((d) => d.date.getTime())));
+    const start = new Date(latest);
+    start.setDate(start.getDate() - (days - 1));
+
+    setFromDate(start.toISOString().slice(0, 10));
+    setToDate(latest.toISOString().slice(0, 10));
+  };
+
+  const rangeLabel = useMemo(() => {
+    if (dateRange === "custom" && (fromDate || toDate)) {
+      const fromText = fromDate || "..";
+      const toText = toDate || "..";
+      return `Custom: ${fromText} → ${toText}`;
+    }
+
+    const labelMap: Record<DateRange, string> = {
+      "7": "7 Hari Terakhir",
+      "14": "14 Hari Terakhir",
+      "30": "30 Hari Terakhir",
+      "90": "3 Bulan Terakhir",
+      "180": "6 Bulan Terakhir",
+      "365": "1 Tahun Terakhir",
+      "730": "2 Tahun Terakhir",
+      all: "Tampilkan Semua",
+      custom: "Custom Range",
+    };
+
+    return labelMap[dateRange];
+  }, [dateRange, fromDate, toDate]);
+
+  const customSummary = useMemo(() => {
+    if (fromDate || toDate) {
+      const fromText = fromDate || "..";
+      const toText = toDate || "..";
+      return `${fromText} → ${toText}`;
+    }
+    return "Masukkan tanggal untuk mulai";
+  }, [fromDate, toDate]);
 
   const latestData = filteredData[filteredData.length - 1];
   const previousData =
@@ -92,10 +171,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 md:py-8 space-y-5 md:space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold">Harga Emas Antam</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+            Harga Emas Antam
+          </h1>
           <p className="text-muted-foreground">
             Pantau harga jual, beli, dan spread emas ANTAM secara real-time
           </p>
@@ -145,7 +226,7 @@ export default function Home() {
 
         {/* Stats */}
         {latestData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
             <StatBox
               label="Harga Jual"
               value={formatCurrency(latestData.amountSell)}
@@ -189,21 +270,91 @@ export default function Home() {
         )}
 
         {/* Chart Section */}
-        <Card className="p-4 sm:p-5 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
-            <h2 className="text-xl font-semibold">Grafik Harga</h2>
-            <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
-              <SelectTrigger className="w-full md:w-48 h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">7 Hari Terakhir</SelectItem>
-                <SelectItem value="30">30 Hari Terakhir</SelectItem>
-                <SelectItem value="180">6 Bulan Terakhir</SelectItem>
-                <SelectItem value="365">1 Tahun Terakhir</SelectItem>
-                <SelectItem value="all">Tampilkan Semua</SelectItem>
-              </SelectContent>
-            </Select>
+        <Card className="p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-semibold">Grafik Harga</h2>
+                <span className="hidden sm:inline-flex items-center rounded-full border border-border/80 bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                  {rangeLabel}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Select value={dateRange} onValueChange={(value) => applyPreset(value as DateRange)}>
+                  <SelectTrigger className="h-10 w-full sm:w-48">
+                    <SelectValue placeholder="Pilih rentang" aria-label={rangeLabel}>
+                      {rangeLabel}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">7 Hari Terakhir</SelectItem>
+                    <SelectItem value="14">14 Hari Terakhir</SelectItem>
+                    <SelectItem value="30">30 Hari Terakhir</SelectItem>
+                    <SelectItem value="90">3 Bulan Terakhir</SelectItem>
+                    <SelectItem value="180">6 Bulan Terakhir</SelectItem>
+                    <SelectItem value="365">1 Tahun Terakhir</SelectItem>
+                    <SelectItem value="730">2 Tahun Terakhir</SelectItem>
+                    <SelectItem value="all">Tampilkan Semua</SelectItem>
+                    <SelectItem value="custom">Custom Range</SelectItem>
+                  </SelectContent>
+                </Select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFromDate("");
+                    setToDate("");
+                    setDateRange("180");
+                  }}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {dateRange === "custom" && (
+              <fieldset className="rounded-lg border border-border/80 bg-muted/30 p-3 sm:p-4 space-y-3">
+                <legend className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Custom tanggal</legend>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-xs text-muted-foreground">Isi salah satu atau kedua tanggal. Kosongkan untuk kembali ke preset.</div>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-border/70 bg-background px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+                    {customSummary}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-muted-foreground" htmlFor="from-date">Dari</label>
+                    <input
+                      id="from-date"
+                      type="date"
+                      className="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={fromDate}
+                      onChange={(e) => {
+                        setFromDate(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-muted-foreground" htmlFor="to-date">Sampai</label>
+                    <input
+                      id="to-date"
+                      type="date"
+                      className="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={toDate}
+                      onChange={(e) => {
+                        setToDate(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <div className="w-full rounded-md border border-dashed border-border/70 bg-background px-3 py-2 text-xs text-muted-foreground">
+                      Gunakan preset untuk cepat, atau isi tanggal untuk presisi.
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            )}
           </div>
           {filteredData.length > 0 ? (
             <PriceChart data={filteredData} />
@@ -236,7 +387,7 @@ export default function Home() {
             untuk menghitung keuntungan atau kerugian dari buyback emas Anda
           </p>
           <p className="text-xs">
-            © 2025 Harga Emas ANTAM • Data dari logammulia.com • Dibuat dengan ❤️ menggunakan Next.js dan Tailwind CSS
+            Dibuat dengan ❤️ menggunakan Next.js dan Tailwind CSS
           </p>
         </div>
       </div>

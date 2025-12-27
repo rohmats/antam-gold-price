@@ -23,18 +23,20 @@ export function StatBox({
   variant = "default",
 }: StatBoxProps) {
   return (
-    <Card className="bg-card">
+    <Card className="bg-card h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
           {label}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`text-2xl font-bold ${variantStyles[variant]}`}>
+        <div className={`text-xl sm:text-2xl font-bold ${variantStyles[variant]}`}>
           {value}
         </div>
         {subtext && (
-          <p className="text-xs text-muted-foreground mt-1">{subtext}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 leading-snug">
+            {subtext}
+          </p>
         )}
       </CardContent>
     </Card>
