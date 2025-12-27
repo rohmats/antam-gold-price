@@ -92,7 +92,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold">Harga Emas Antam</h1>
@@ -145,7 +145,7 @@ export default function Home() {
 
         {/* Stats */}
         {latestData && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatBox
               label="Harga Jual"
               value={formatCurrency(latestData.amountSell)}
@@ -189,11 +189,11 @@ export default function Home() {
         )}
 
         {/* Chart Section */}
-        <Card className="p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <Card className="p-4 sm:p-5 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
             <h2 className="text-xl font-semibold">Grafik Harga</h2>
             <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

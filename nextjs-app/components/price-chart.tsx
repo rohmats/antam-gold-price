@@ -173,7 +173,10 @@ export function PriceChart({ data }: PriceChartProps) {
   }
 
   return (
-    <ChartContainer config={chartConfig} className="h-[400px] w-full">
+    <ChartContainer
+      config={chartConfig}
+      className="w-full h-[320px] sm:h-[380px] md:h-[420px]"
+    >
       <ComposedChart data={chartData}>
         <CartesianGrid
           strokeDasharray="3 3"
