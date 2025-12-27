@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   title: "Harga Emas Antam",
   description: "Aplikasi untuk melihat harga emas ANTAM dan simulasi buyback",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
   },
 };
 
