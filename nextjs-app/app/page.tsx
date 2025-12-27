@@ -236,7 +236,7 @@ export default function Home() {
             untuk menghitung keuntungan atau kerugian dari buyback emas Anda
           </p>
           <p className="text-xs">
-            © 2025 Harga Emas ANTAM • Data dari Logam Mulia
+            © 2025 Harga Emas ANTAM • Data dari logammulia.com • Dibuat dengan ❤️ menggunakan Next.js dan Tailwind CSS
           </p>
         </div>
       </div>
