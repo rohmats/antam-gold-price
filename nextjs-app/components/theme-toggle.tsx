@@ -3,13 +3,13 @@
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMounted } from "@/lib/use-mounted";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const mounted = useMounted();
 
-  const isClient = typeof window !== "undefined";
-
-  if (!isClient) {
+  if (!mounted) {
     return null;
   }
 

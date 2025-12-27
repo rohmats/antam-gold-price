@@ -289,9 +289,42 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-semibold">Grafik Harga</h2>
-                <span className="hidden sm:inline-flex items-center rounded-full border border-border/80 bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                  {rangeLabel}
-                </span>
+                {rangeChange && (
+                  <div className="flex items-center gap-2 text-[11px] sm:text-xs">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
+                      <span className="font-semibold text-foreground">Jual</span>
+                      <span
+                        className={
+                          rangeChange.sellPct !== null && rangeChange.sellPct > 0
+                            ? "text-green-600 dark:text-green-400"
+                            : rangeChange.sellPct !== null && rangeChange.sellPct < 0
+                              ? "text-red-600 dark:text-red-400"
+                              : "text-muted-foreground"
+                        }
+                      >
+                        {rangeChange.sellPct !== null
+                          ? `${rangeChange.sellPct > 0 ? "↑" : rangeChange.sellPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.sellPct).toFixed(2)}%`
+                          : "n/a"}
+                      </span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
+                      <span className="font-semibold text-foreground">Beli</span>
+                      <span
+                        className={
+                          rangeChange.buyPct !== null && rangeChange.buyPct > 0
+                            ? "text-green-600 dark:text-green-400"
+                            : rangeChange.buyPct !== null && rangeChange.buyPct < 0
+                              ? "text-red-600 dark:text-red-400"
+                              : "text-muted-foreground"
+                        }
+                      >
+                        {rangeChange.buyPct !== null
+                          ? `${rangeChange.buyPct > 0 ? "↑" : rangeChange.buyPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.buyPct).toFixed(2)}%`
+                          : "n/a"}
+                      </span>
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Select value={dateRange} onValueChange={(value) => applyPreset(value as DateRange)}>

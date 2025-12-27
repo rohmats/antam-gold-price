@@ -17,6 +17,7 @@ import {
   ChartContainer,
 } from "@/components/ui/chart";
 import { Card } from "@/components/ui/card";
+import { useMounted } from "@/lib/use-mounted";
 
 interface PriceChartProps {
   data: GoldData[];
@@ -106,9 +107,9 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 };
 
 export function PriceChart({ data }: PriceChartProps) {
-  const isClient = typeof window !== "undefined";
+  const mounted = useMounted();
 
-  if (!isClient) {
+  if (!mounted) {
     return <div className="h-96 bg-muted animate-pulse rounded" />;
   }
 
