@@ -4,7 +4,8 @@
   "description": "Scraper for ANTAM gold prices from logammulia.com",
   "main": "scraper.js",
   "scripts": {
-    "scrape": "node scraper.js"
+    "scrape": "node scraper.js",
+    "test": "npm run lint --prefix nextjs-app"
   },
   "keywords": [
     "antam",

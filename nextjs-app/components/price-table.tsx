@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -34,8 +34,9 @@ export function PriceTable({ data }: PriceTableProps) {
     return [...data].sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [data]);
 
-  const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
-  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const startIdx = (safePage - 1) * ITEMS_PER_PAGE;
   const paginatedData = sortedData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   return (

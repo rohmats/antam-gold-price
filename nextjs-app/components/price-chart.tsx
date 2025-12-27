@@ -2,26 +2,19 @@
 
 import {
   Area,
-  AreaChart,
   CartesianGrid,
   Line,
-  LineChart,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
-  ResponsiveContainer,
   ComposedChart,
   TooltipProps,
 } from "recharts";
 import { GoldData, formatCurrency } from "@/lib/gold-data";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Card } from "@/components/ui/card";
 
@@ -54,7 +47,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   const spread = payload.find((p) => p.dataKey === "spread");
   
   // Use fullDate from payload if available
-  const fullDate = (payload[0]?.payload as any)?.fullDate || label;
+  const fullDate = (payload[0]?.payload as { fullDate?: string } | undefined)?.fullDate || label;
 
   return (
     <Card className="border shadow-lg p-3 min-w-[200px]">
@@ -113,15 +106,18 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 };
 
 export function PriceChart({ data }: PriceChartProps) {
-  const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
+  const isClient = typeof window !== "undefined";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+  if (!isClient) {
     return <div className="h-96 bg-muted animate-pulse rounded" />;
+  }
+
+  if (!data.length) {
+    return (
+      <Card className="p-6 text-sm text-muted-foreground">
+        Data belum tersedia. Coba muat ulang atau tunggu pembaruan berikutnya.
+      </Card>
+    );
   }
 
   const chartData = data.map((item) => ({
@@ -138,21 +134,18 @@ export function PriceChart({ data }: PriceChartProps) {
     buy: item.amountBuy,
     spread: item.difference,
   }));
-
-  const isDark = theme === "dark";
-
   // Calculate min/max for Y-axis domains
   const priceValues = data.flatMap((item) => [item.amountSell, item.amountBuy]);
   const minPrice = Math.min(...priceValues);
   const maxPrice = Math.max(...priceValues);
   const priceRange = maxPrice - minPrice;
-  const pricePadding = priceRange * 0.1; // 10% padding
+  const pricePadding = priceRange === 0 ? Math.max(1, minPrice * 0.01) : priceRange * 0.1;
 
   const spreadValues = data.map((item) => item.difference);
   const minSpread = Math.min(...spreadValues);
   const maxSpread = Math.max(...spreadValues);
   const spreadRange = maxSpread - minSpread;
-  const spreadPadding = spreadRange * 0.1; // 10% padding
+  const spreadPadding = spreadRange === 0 ? Math.max(1, Math.abs(minSpread) * 0.1) : spreadRange * 0.1;
 
   // Calculate tick interval for X-axis to avoid dense labels
   const dataLength = chartData.length;

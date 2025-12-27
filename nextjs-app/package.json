@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run lint"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",

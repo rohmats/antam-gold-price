@@ -24,6 +24,18 @@ import { AlertCircle } from "lucide-react";
 
 type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "all" | "custom";
 
+const daysMap: Record<DateRange, number | null> = {
+  "7": 7,
+  "14": 14,
+  "30": 30,
+  "90": 90,
+  "180": 180,
+  "365": 365,
+  "730": 730,
+  all: null,
+  custom: null,
+};
+
 export default function Home() {
   const [data, setData] = useState<GoldData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,19 +69,6 @@ export default function Home() {
 
     loadData();
   }, []);
-
-  const daysMap: Record<DateRange, number | null> = {
-    "7": 7,
-    "14": 14,
-    "30": 30,
-    "90": 90,
-    "180": 180,
-    "365": 365,
-    "730": 730,
-    all: null,
-    custom: null,
-  };
-
   const filteredData = useMemo(() => {
     const rangeDays = dateRange === "custom" ? null : daysMap[dateRange];
     let base = filterByDateRange(data, rangeDays);
@@ -146,6 +145,21 @@ export default function Home() {
     }
     return "Masukkan tanggal untuk mulai";
   }, [fromDate, toDate]);
+
+  const rangeChange = useMemo(() => {
+    if (filteredData.length < 2) return null;
+
+    const first = filteredData[0];
+    const last = filteredData[filteredData.length - 1];
+
+    const pct = (current: number, prev: number) =>
+      prev > 0 ? (((current - prev) / prev) * 100) : null;
+
+    return {
+      sellPct: pct(last.amountSell, first.amountSell),
+      buyPct: pct(last.amountBuy, first.amountBuy),
+    };
+  }, [filteredData]);
 
   const latestData = filteredData[filteredData.length - 1];
   const previousData =
@@ -311,6 +325,23 @@ export default function Home() {
                 </button>
               </div>
             </div>
+
+            {rangeChange && (
+              <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
+                  <span className="font-semibold text-foreground">Harga Jual:</span>
+                  <span className={rangeChange.sellPct && rangeChange.sellPct > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
+                    {rangeChange.sellPct !== null ? `${rangeChange.sellPct > 0 ? "↑" : rangeChange.sellPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.sellPct).toFixed(2)}%` : "n/a"}
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2 py-1">
+                  <span className="font-semibold text-foreground">Harga Beli:</span>
+                  <span className={rangeChange.buyPct && rangeChange.buyPct > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
+                    {rangeChange.buyPct !== null ? `${rangeChange.buyPct > 0 ? "↑" : rangeChange.buyPct < 0 ? "↓" : "→"} ${Math.abs(rangeChange.buyPct).toFixed(2)}%` : "n/a"}
+                  </span>
+                </span>
+              </div>
+            )}
 
             {dateRange === "custom" && (
               <fieldset className="rounded-lg border border-border/80 bg-muted/30 p-3 sm:p-4 space-y-3">
