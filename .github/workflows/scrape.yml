@@ -3,7 +3,7 @@ name: Scrape ANTAM Gold Prices
 on:
   schedule:
     # Run every day at 00:00, 08:00, and 16:00 UTC (07:00, 15:00, 23:00 WIB)
-    - cron: '0 0,8,16 * * *'
+    - cron: '0 5,13 * * *'
   workflow_dispatch:
 
 permissions:
