@@ -14,7 +14,7 @@ async function scrapeGoldData() {
 
   try {
     const page = await browser.newPage();
-    await page.goto('https://www.logammulia.com/id', { waitUntil: 'networkidle2', timeout: 0 });
+    await page.goto('https://www.logammulia.com/id', { waitUntil: 'networkidle2', timeout: 30 });
     await page.waitForSelector('input[name="_token"]');
 
     const token = await page.$eval('input[name="_token"]', el => el.value);
