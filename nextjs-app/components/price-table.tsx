@@ -118,8 +118,8 @@ export function PriceTable({ data }: PriceTableProps) {
                       <span
                         className={
                           item.amountBuyDiff > 0
-                            ? "text-red-600 dark:text-red-400"
-                            : "text-green-600 dark:text-green-400"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-red-600 dark:text-red-400"
                         }
                       >
                         {item.amountBuyDiff > 0 ? "+" : ""}

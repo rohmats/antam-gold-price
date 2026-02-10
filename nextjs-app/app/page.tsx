@@ -22,7 +22,7 @@ import {
 } from "@/lib/gold-data";
 import { AlertCircle } from "lucide-react";
 
-type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "all" | "custom";
+type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "1825" | "3650" | "all" | "custom";
 
 const daysMap: Record<DateRange, number | null> = {
   "7": 7,
@@ -32,6 +32,8 @@ const daysMap: Record<DateRange, number | null> = {
   "180": 180,
   "365": 365,
   "730": 730,
+  "1825": 1825,
+  "3650": 3650,
   all: null,
   custom: null,
 };
@@ -130,6 +132,8 @@ export default function Home() {
       "180": "6 Bulan Terakhir",
       "365": "1 Tahun Terakhir",
       "730": "2 Tahun Terakhir",
+      "1825": "5 Tahun Terakhir",
+      "3650": "10 Tahun Terakhir",
       all: "Tampilkan Semua",
       custom: "Custom Range",
     };
@@ -164,6 +168,7 @@ export default function Home() {
   const latestData = filteredData[filteredData.length - 1];
   const previousData =
     filteredData.length > 1 ? filteredData[filteredData.length - 2] : null;
+
 
   if (loading) {
     return (
@@ -341,6 +346,8 @@ export default function Home() {
                     <SelectItem value="180">6 Bulan Terakhir</SelectItem>
                     <SelectItem value="365">1 Tahun Terakhir</SelectItem>
                     <SelectItem value="730">2 Tahun Terakhir</SelectItem>
+                    <SelectItem value="1825">5 Tahun Terakhir</SelectItem>
+                    <SelectItem value="3650">10 Tahun Terakhir</SelectItem>
                     <SelectItem value="all">Tampilkan Semua</SelectItem>
                     <SelectItem value="custom">Custom Range</SelectItem>
                   </SelectContent>
@@ -413,6 +420,7 @@ export default function Home() {
             </div>
           )}
         </Card>
+
 
         {/* Table Section */}
         <div className="space-y-4">
