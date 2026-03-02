@@ -34,8 +34,8 @@ export function StatBox({
   variant = "default",
 }: StatBoxProps) {
   return (
-    <Card className="h-full border-border/70 bg-card/80 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-      <CardHeader className="pb-1">
+    <Card className="h-full gap-2 border-border/70 bg-card/80 py-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <CardHeader className="pb-0">
         <CardTitle className="flex items-center justify-between gap-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <span>{label}</span>
           {icon ? (
@@ -45,7 +45,7 @@ export function StatBox({
           ) : null}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-1.5">
         <div className={`text-xl sm:text-2xl font-bold leading-tight ${variantStyles[variant]}`}>
           {value}
         </div>
