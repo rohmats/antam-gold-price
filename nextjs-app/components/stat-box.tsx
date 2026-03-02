@@ -1,11 +1,14 @@
 "use client";
 
+import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StatBoxProps {
   label: string;
   value: string;
   subtext?: string;
+  icon?: ReactNode;
+  trend?: "up" | "down" | "neutral";
   variant?: "default" | "success" | "error" | "info";
 }
 
@@ -16,27 +19,40 @@ const variantStyles = {
   info: "text-blue-600 dark:text-blue-400",
 };
 
+const trendStyles = {
+  up: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
+  down: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300",
+  neutral: "border-border/80 bg-muted/50 text-muted-foreground",
+};
+
 export function StatBox({
   label,
   value,
   subtext,
+  icon,
+  trend = "neutral",
   variant = "default",
 }: StatBoxProps) {
   return (
-    <Card className="bg-card h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-          {label}
+    <Card className="h-full border-border/70 bg-card/80 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <CardHeader className="pb-1">
+        <CardTitle className="flex items-center justify-between gap-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <span>{label}</span>
+          {icon ? (
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-muted/40 text-foreground/80">
+              {icon}
+            </span>
+          ) : null}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className={`text-xl sm:text-2xl font-bold ${variantStyles[variant]}`}>
+      <CardContent className="space-y-2">
+        <div className={`text-xl sm:text-2xl font-bold leading-tight ${variantStyles[variant]}`}>
           {value}
         </div>
         {subtext && (
-          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 leading-snug">
+          <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] sm:text-xs font-medium leading-snug ${trendStyles[trend]}`}>
             {subtext}
-          </p>
+          </span>
         )}
       </CardContent>
     </Card>

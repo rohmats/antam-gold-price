@@ -20,7 +20,7 @@ import {
   filterByDateRange,
   formatCurrency,
 } from "@/lib/gold-data";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CalendarClock, CircleDollarSign, HandCoins, MoveRightLeft } from "lucide-react";
 
 type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "1825" | "3650" | "all" | "custom";
 
@@ -169,6 +169,33 @@ export default function Home() {
   const previousData =
     filteredData.length > 1 ? filteredData[filteredData.length - 2] : null;
 
+  const getDeltaInfo = (current: number, previous: number | null) => {
+    if (previous === null || current === previous) {
+      return {
+        text: "Tidak berubah dari data sebelumnya",
+        trend: "neutral" as const,
+      };
+    }
+
+    const increased = current > previous;
+    return {
+      text: `${increased ? "Naik" : "Turun"} ${Math.abs(current - previous).toLocaleString("id-ID")}`,
+      trend: increased ? ("up" as const) : ("down" as const),
+    };
+  };
+
+  const sellDelta = latestData
+    ? getDeltaInfo(latestData.amountSell, previousData ? previousData.amountSell : null)
+    : null;
+
+  const buyDelta = latestData
+    ? getDeltaInfo(latestData.amountBuy, previousData ? previousData.amountBuy : null)
+    : null;
+
+  const spreadDelta = latestData
+    ? getDeltaInfo(latestData.difference, previousData ? previousData.difference : null)
+    : null;
+
 
   if (loading) {
     return (
@@ -249,41 +276,39 @@ export default function Home() {
             <StatBox
               label="Harga Jual"
               value={formatCurrency(latestData.amountSell)}
-              subtext={
-                previousData &&
-                latestData.amountSell !== previousData.amountSell
-                  ? `${latestData.amountSell > previousData.amountSell ? "↑" : "↓"} ${Math.abs(latestData.amountSell - previousData.amountSell).toLocaleString("id-ID")}`
-                  : "No change"
-              }
+              subtext={sellDelta?.text}
+              trend={sellDelta?.trend}
+              icon={<CircleDollarSign className="h-4 w-4" />}
               variant="error"
             />
             <StatBox
               label="Harga Beli"
               value={formatCurrency(latestData.amountBuy)}
-              subtext={
-                previousData &&
-                latestData.amountBuy !== previousData.amountBuy
-                  ? `${latestData.amountBuy > previousData.amountBuy ? "↑" : "↓"} ${Math.abs(latestData.amountBuy - previousData.amountBuy).toLocaleString("id-ID")}`
-                  : "No change"
-              }
+              subtext={buyDelta?.text}
+              trend={buyDelta?.trend}
+              icon={<HandCoins className="h-4 w-4" />}
               variant="success"
             />
             <StatBox
               label="Spread"
               value={formatCurrency(latestData.difference)}
-              subtext={`${latestData.percentSpread.toFixed(2)}% dari harga jual`}
+              subtext={spreadDelta ? `${latestData.percentSpread.toFixed(2)}% • ${spreadDelta.text}` : `${latestData.percentSpread.toFixed(2)}% dari harga jual`}
+              trend={spreadDelta?.trend}
+              icon={<MoveRightLeft className="h-4 w-4" />}
               variant="info"
             />
             <StatBox
               label="Tanggal Update"
               value={latestData.date.toLocaleDateString("id-ID", {
                 day: "2-digit",
-                month: "2-digit",
-                year: "2-digit",
+                month: "short",
+                year: "numeric",
               })}
-              subtext={latestData.date.toLocaleDateString("id-ID", {
+              subtext={`${latestData.date.toLocaleDateString("id-ID", {
                 weekday: "long",
-              })}
+              })} • Data harian ANTAM`}
+              trend="neutral"
+              icon={<CalendarClock className="h-4 w-4" />}
             />
           </div>
         )}
