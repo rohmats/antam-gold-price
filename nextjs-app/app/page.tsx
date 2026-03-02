@@ -20,7 +20,7 @@ import {
   filterByDateRange,
   formatCurrency,
 } from "@/lib/gold-data";
-import { AlertCircle, CalendarClock, CircleDollarSign, HandCoins, MoveRightLeft } from "lucide-react";
+import { AlertCircle, CalendarClock, CircleDollarSign, HandCoins, MoveRight } from "lucide-react";
 
 type DateRange = "7" | "14" | "30" | "90" | "180" | "365" | "730" | "1825" | "3650" | "all" | "custom";
 
@@ -294,7 +294,7 @@ export default function Home() {
               value={formatCurrency(latestData.difference)}
               subtext={spreadDelta ? `${latestData.percentSpread.toFixed(2)}% • ${spreadDelta.text}` : `${latestData.percentSpread.toFixed(2)}% dari harga jual`}
               trend={spreadDelta?.trend}
-              icon={<MoveRightLeft className="h-4 w-4" />}
+              icon={<MoveRight className="h-4 w-4" />}
               variant="info"
             />
             <StatBox
