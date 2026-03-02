@@ -197,17 +197,26 @@ export default function SimulasiPage() {
           <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
             <AlertCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
             <AlertDescription className="ml-2 text-green-900 dark:text-green-200">
-              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                <div className="leading-relaxed">
-                  <strong>Harga Buyback ({selectedBuybackData.date.toLocaleDateString("id-ID")}):</strong> {formatCurrency(selectedBuybackData.amountBuy)} per gram
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_260px] md:items-end">
+                <div className="rounded-md border border-green-200/80 bg-white/60 px-4 py-3 dark:border-green-800/80 dark:bg-green-900/30">
+                  <p className="text-xs font-medium uppercase tracking-wide text-green-700 dark:text-green-300">
+                    Harga Buyback
+                  </p>
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    {selectedBuybackData.date.toLocaleDateString("id-ID")}
+                  </p>
+                  <p className="mt-1 text-xl font-bold leading-tight text-green-900 dark:text-green-100">
+                    {formatCurrency(selectedBuybackData.amountBuy)}
+                    <span className="ml-1 text-sm font-medium">per gram</span>
+                  </p>
                 </div>
-                <div className="w-full md:w-64">
+                <div className="rounded-md border border-green-200/80 bg-white/60 px-4 py-3 dark:border-green-800/80 dark:bg-green-900/30">
                   <label className="block text-sm font-medium mb-1">
                     Tanggal Buyback
                   </label>
                   <Input
                     type="date"
-                    className="bg-background text-foreground"
+                    className="bg-background text-foreground w-full"
                     min={minDate}
                     max={maxDate}
                     value={tanggalBuyback}
