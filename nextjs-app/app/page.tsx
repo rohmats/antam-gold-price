@@ -217,27 +217,30 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 md:py-8 space-y-5 md:space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 md:py-8 space-y-6 md:space-y-8">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+        <div className="space-y-3">
+          <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Dashboard Harga Harian
+          </span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-tight text-foreground">
             Harga Emas ANTAM
           </h1>
-          <p className="text-muted-foreground">
+          <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-muted-foreground">
             Pantau harga jual, beli, dan spread emas ANTAM secara real-time
           </p>
         </div>
 
         {/* Info Alert */}
-        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-          <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <AlertDescription className="ml-2 text-blue-900 dark:text-blue-200">
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-              <span className="flex items-center gap-1.5">
-                <span className="font-medium">Sumber data:</span>
+        <Alert className="rounded-xl border-blue-200/90 bg-blue-50/80 px-4 py-3.5 dark:border-blue-800 dark:bg-blue-950/60">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+          <AlertDescription className="ml-2 text-xs sm:text-sm leading-relaxed text-blue-900 dark:text-blue-200">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-white/70 px-2.5 py-1 dark:border-blue-800/80 dark:bg-blue-950/40">
+                <span className="font-semibold">Sumber data:</span>
                 <a
                   href="https://logammulia.com"
-                  className="underline font-semibold hover:no-underline inline-flex items-center gap-1"
+                  className="inline-flex items-center gap-1 font-semibold underline underline-offset-2 hover:no-underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -247,10 +250,9 @@ export default function Home() {
                   </svg>
                 </a>
               </span>
-              <span className="hidden md:inline text-muted-foreground">•</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-medium">Terakhir diperbarui:</span>
-                <span className="font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-white/70 px-2.5 py-1 dark:border-blue-800/80 dark:bg-blue-950/40">
+                <span className="font-semibold">Terakhir diperbarui:</span>
+                <span className="font-semibold whitespace-nowrap">
                   {latestData?.date.toLocaleDateString("id-ID", {
                     weekday: "long",
                     year: "numeric",
@@ -272,7 +274,7 @@ export default function Home() {
 
         {/* Stats */}
         {latestData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3 md:gap-4">
             <StatBox
               label="Harga Jual"
               value={formatCurrency(latestData.amountSell)}
@@ -314,7 +316,7 @@ export default function Home() {
         )}
 
         {/* Chart Section */}
-        <Card className="p-3 sm:p-4 md:p-6">
+        <Card className="p-4 sm:p-5 md:p-6">
           <div className="flex flex-col gap-3 md:gap-4 mb-4 md:mb-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -448,7 +450,7 @@ export default function Home() {
 
 
         {/* Table Section */}
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           <h2 className="text-xl font-semibold">Data Detail</h2>
           {filteredData.length > 0 ? (
             <PriceTable data={filteredData} />
