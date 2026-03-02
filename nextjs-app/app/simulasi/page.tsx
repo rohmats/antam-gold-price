@@ -283,16 +283,19 @@ export default function SimulasiPage() {
               <StatBox
                 label="Total Pembelian"
                 value={formatCurrency(totalStats.beli)}
+                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
               />
               <StatBox
                 label="Total Penjualan"
                 value={formatCurrency(totalStats.jual)}
+                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
               />
               <StatBox
                 label="Total Keuntungan/Rugi"
                 value={formatCurrency(totalStats.rugi)}
                 subtext={`${totalPersentase.toFixed(2)}%`}
                 variant={totalStats.rugi >= 0 ? "success" : "error"}
+                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
               />
             </div>
 

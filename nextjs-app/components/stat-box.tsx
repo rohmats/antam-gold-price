@@ -10,6 +10,7 @@ interface StatBoxProps {
   icon?: ReactNode;
   trend?: "up" | "down" | "neutral";
   variant?: "default" | "success" | "error" | "info";
+  valueClassName?: string;
 }
 
 const variantStyles = {
@@ -32,6 +33,7 @@ export function StatBox({
   icon,
   trend = "neutral",
   variant = "default",
+  valueClassName,
 }: StatBoxProps) {
   return (
     <Card className="h-full gap-2 border-border/70 bg-card/80 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:py-5">
@@ -46,7 +48,9 @@ export function StatBox({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-1.5 px-4 sm:px-5">
-        <div className={`w-full min-w-0 break-words text-[clamp(1.05rem,2.3vw,1.55rem)] font-bold leading-tight ${variantStyles[variant]}`}>
+        <div
+          className={`w-full min-w-0 break-words text-[clamp(1.05rem,2.3vw,1.55rem)] font-bold leading-tight ${variantStyles[variant]} ${valueClassName ?? ""}`}
+        >
           {value}
         </div>
         {subtext && (
