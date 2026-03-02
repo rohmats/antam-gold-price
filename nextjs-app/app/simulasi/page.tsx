@@ -20,7 +20,7 @@ import {
   combineData,
   formatCurrency,
 } from "@/lib/gold-data";
-import { AlertCircle, Trash2 } from "lucide-react";
+import { AlertCircle, Coins, HandCoins, ShoppingCart, Trash2, TrendingDown, TrendingUp } from "lucide-react";
 
 interface BuybackResult {
   id: string;
@@ -275,27 +275,39 @@ export default function SimulasiPage() {
         {/* Results Summary */}
         {results.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 md:gap-4">
               <StatBox
                 label="Total Emas"
                 value={`${totalStats.emas.toLocaleString("id-ID", { maximumFractionDigits: 2 })} g`}
+                valueClassName="text-[clamp(1rem,1.9vw,1.28rem)] tabular-nums"
+                icon={<Coins className="h-4 w-4" />}
               />
               <StatBox
                 label="Total Pembelian"
                 value={formatCurrency(totalStats.beli)}
-                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
+                valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                icon={<ShoppingCart className="h-4 w-4" />}
               />
               <StatBox
                 label="Total Penjualan"
                 value={formatCurrency(totalStats.jual)}
-                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
+                valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                icon={<HandCoins className="h-4 w-4" />}
               />
               <StatBox
                 label="Total Untung/Rugi"
                 value={formatCurrency(totalStats.rugi)}
-                subtext={`${totalPersentase.toFixed(2)}%`}
+                subtext={`ROI ${totalPersentase.toFixed(2)}%`}
                 variant={totalStats.rugi >= 0 ? "success" : "error"}
-                valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
+                trend={totalStats.rugi >= 0 ? "up" : "down"}
+                valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                icon={
+                  totalStats.rugi >= 0 ? (
+                    <TrendingUp className="h-4 w-4" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4" />
+                  )
+                }
               />
             </div>
 
