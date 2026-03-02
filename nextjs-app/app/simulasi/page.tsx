@@ -194,38 +194,45 @@ export default function SimulasiPage() {
 
         {/* Current Price Info */}
         {selectedBuybackData && (
-          <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
-            <AlertCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <AlertDescription className="ml-2 text-green-900 dark:text-green-200">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_260px] md:items-end">
-                <div className="rounded-md border border-green-200/80 bg-white/60 px-4 py-3 dark:border-green-800/80 dark:bg-green-900/30">
-                  <p className="text-xs font-medium uppercase tracking-wide text-green-700 dark:text-green-300">
-                    Harga Buyback
-                  </p>
-                  <p className="text-sm text-green-800 dark:text-green-200">
-                    {selectedBuybackData.date.toLocaleDateString("id-ID")}
-                  </p>
-                  <p className="mt-1 text-xl font-bold leading-tight text-green-900 dark:text-green-100">
-                    {formatCurrency(selectedBuybackData.amountBuy)}
-                    <span className="ml-1 text-sm font-medium">per gram</span>
-                  </p>
-                </div>
-                <div className="rounded-md border border-green-200/80 bg-white/60 px-4 py-3 dark:border-green-800/80 dark:bg-green-900/30">
-                  <label className="block text-sm font-medium mb-1">
-                    Tanggal Buyback
-                  </label>
-                  <Input
-                    type="date"
-                    className="bg-background text-foreground w-full"
-                    min={minDate}
-                    max={maxDate}
-                    value={tanggalBuyback}
-                    onChange={(e) => setTanggalBuyback(e.target.value)}
-                  />
-                </div>
+          <Card className="border-green-200 bg-green-50/70 p-4 md:p-5 dark:border-green-800 dark:bg-green-950/40">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-green-700 dark:text-green-300">
+                  Harga Buyback untuk Simulasi
+                </p>
+                <p className="text-2xl font-bold leading-tight text-green-900 md:text-3xl dark:text-green-100">
+                  {formatCurrency(selectedBuybackData.amountBuy)}
+                  <span className="ml-1 text-sm font-medium text-green-800 dark:text-green-200">
+                    per gram
+                  </span>
+                </p>
+                <p className="text-sm text-green-800 dark:text-green-200">
+                  Data tanggal {selectedBuybackData.date.toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
-            </AlertDescription>
-          </Alert>
+
+              <div className="w-full md:w-[260px]">
+                <label className="mb-1.5 block text-sm font-medium text-green-900 dark:text-green-100">
+                  Tanggal Buyback
+                </label>
+                <Input
+                  type="date"
+                  className="h-10 w-full bg-background text-foreground"
+                  min={minDate}
+                  max={maxDate}
+                  value={tanggalBuyback}
+                  onChange={(e) => setTanggalBuyback(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-green-700/90 dark:text-green-300/90">
+                  Harga di atas mengikuti tanggal yang dipilih.
+                </p>
+              </div>
+            </div>
+          </Card>
         )}
 
         {/* Input Form */}
