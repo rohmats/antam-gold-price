@@ -41,7 +41,30 @@ export default function SimulasiPage() {
   const [tanggalBeli, setTanggalBeli] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
+  const [tanggalBuyback, setTanggalBuyback] = useState<string>("");
   const [results, setResults] = useState<BuybackResult[]>([]);
+
+  const toISODate = (date: Date) => date.toISOString().split("T")[0];
+
+  const findClosestData = (dateStr: string): GoldData | null => {
+    if (data.length === 0) return null;
+
+    const selectedDate = new Date(dateStr);
+    selectedDate.setUTCHours(0, 0, 0, 0);
+
+    let closestData = data[0];
+    let minDiff = Math.abs(closestData.date.getTime() - selectedDate.getTime());
+
+    for (const item of data) {
+      const diff = Math.abs(item.date.getTime() - selectedDate.getTime());
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestData = item;
+      }
+    }
+
+    return closestData;
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -57,6 +80,10 @@ export default function SimulasiPage() {
         const combined = combineData(sellData, buyData);
 
         setData(combined);
+        const latest = combined[combined.length - 1];
+        if (latest) {
+          setTanggalBuyback(toISODate(latest.date));
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load data"
@@ -70,6 +97,11 @@ export default function SimulasiPage() {
   }, []);
 
   const latestData = data[data.length - 1];
+  const selectedBuybackData = tanggalBuyback
+    ? findClosestData(tanggalBuyback)
+    : latestData ?? null;
+  const minDate = data.length > 0 ? toISODate(data[0].date) : undefined;
+  const maxDate = latestData ? toISODate(latestData.date) : undefined;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,31 +112,17 @@ export default function SimulasiPage() {
     }
 
     const amount = parseFloat(jumlahEmas);
-    const selectedDate = new Date(tanggalBeli);
-    selectedDate.setUTCHours(0, 0, 0, 0);
+    const closestData = findClosestData(tanggalBeli);
+    const buybackDataForCalculation = selectedBuybackData ?? latestData;
 
-    // Find the closest date in data
-    let closestData = data[0];
-    let minDiff = Math.abs(
-      closestData.date.getTime() - selectedDate.getTime()
-    );
-
-    for (const item of data) {
-      const diff = Math.abs(item.date.getTime() - selectedDate.getTime());
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestData = item;
-      }
-    }
-
-    if (!latestData) {
+    if (!closestData || !buybackDataForCalculation) {
       setError("Data tidak tersedia");
       return;
     }
 
     const hargaBeli = closestData.amountSell;
     const totalBeli = amount * hargaBeli;
-    const totalJual = amount * latestData.amountBuy;
+    const totalJual = amount * buybackDataForCalculation.amountBuy;
     const keuntunganRugi = totalJual - totalBeli;
     const persentase =
       totalBeli > 0 ? (keuntunganRugi / totalBeli) * 100 : 0;
@@ -175,11 +193,25 @@ export default function SimulasiPage() {
         )}
 
         {/* Current Price Info */}
-        {latestData && (
+        {selectedBuybackData && (
           <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
             <AlertCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <AlertDescription className="ml-2 text-green-900 dark:text-green-200">
-              <strong>Harga Buyback Terkini ({latestData.date.toLocaleDateString("id-ID")}):</strong> {formatCurrency(latestData.amountBuy)} per gram
+            <AlertDescription className="ml-2 text-green-900 dark:text-green-200 space-y-3">
+              <div>
+                <strong>Harga Buyback ({selectedBuybackData.date.toLocaleDateString("id-ID")}):</strong> {formatCurrency(selectedBuybackData.amountBuy)} per gram
+              </div>
+              <div className="max-w-xs">
+                <label className="block text-sm font-medium mb-1">
+                  Tanggal Buyback
+                </label>
+                <Input
+                  type="date"
+                  value={tanggalBuyback}
+                  onChange={(e) => setTanggalBuyback(e.target.value)}
+                  min={minDate}
+                  max={maxDate}
+                />
+              </div>
             </AlertDescription>
           </Alert>
         )}
