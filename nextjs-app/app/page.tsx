@@ -172,7 +172,7 @@ export default function Home() {
   const getDeltaInfo = (current: number, previous: number | null) => {
     if (previous === null || current === previous) {
       return {
-        text: "Tidak berubah dari data sebelumnya",
+        text: "Tidak berubah.",
         trend: "neutral" as const,
       };
     }
