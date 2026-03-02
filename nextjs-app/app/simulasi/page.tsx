@@ -280,6 +280,8 @@ export default function SimulasiPage() {
                 label="Total Emas"
                 value={`${totalStats.emas.toLocaleString("id-ID", { maximumFractionDigits: 2 })} g`}
                 valueClassName="text-[clamp(1rem,1.9vw,1.28rem)] tabular-nums"
+                shrinkLongValue
+                singleLineValue
                 icon={<Coins className="h-4 w-4" />}
               />
               <StatBox
