@@ -196,21 +196,24 @@ export default function SimulasiPage() {
         {selectedBuybackData && (
           <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
             <AlertCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <AlertDescription className="ml-2 text-green-900 dark:text-green-200 space-y-3">
-              <div>
-                <strong>Harga Buyback ({selectedBuybackData.date.toLocaleDateString("id-ID")}):</strong> {formatCurrency(selectedBuybackData.amountBuy)} per gram
-              </div>
-              <div className="max-w-xs">
-                <label className="block text-sm font-medium mb-1">
-                  Tanggal Buyback
-                </label>
-                <Input
-                  type="date"
-                  value={tanggalBuyback}
-                  onChange={(e) => setTanggalBuyback(e.target.value)}
-                  min={minDate}
-                  max={maxDate}
-                />
+            <AlertDescription className="ml-2 text-green-900 dark:text-green-200">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div className="leading-relaxed">
+                  <strong>Harga Buyback ({selectedBuybackData.date.toLocaleDateString("id-ID")}):</strong> {formatCurrency(selectedBuybackData.amountBuy)} per gram
+                </div>
+                <div className="w-full md:w-64">
+                  <label className="block text-sm font-medium mb-1">
+                    Tanggal Buyback
+                  </label>
+                  <Input
+                    type="date"
+                    className="bg-background text-foreground"
+                    min={minDate}
+                    max={maxDate}
+                    value={tanggalBuyback}
+                    onChange={(e) => setTanggalBuyback(e.target.value)}
+                  />
+                </div>
               </div>
             </AlertDescription>
           </Alert>
