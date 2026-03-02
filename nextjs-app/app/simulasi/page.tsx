@@ -291,7 +291,7 @@ export default function SimulasiPage() {
                 valueClassName="text-[clamp(0.92rem,1.55vw,1.22rem)]"
               />
               <StatBox
-                label="Total Keuntungan/Rugi"
+                label="Total Untung/Rugi"
                 value={formatCurrency(totalStats.rugi)}
                 subtext={`${totalPersentase.toFixed(2)}%`}
                 variant={totalStats.rugi >= 0 ? "success" : "error"}

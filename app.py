@@ -215,7 +215,7 @@ with tab2:
             st.info(f"**Total Emas**: {total_emas:,.1f} gram\n\n**Total Harga Beli**: Rp {total_harga_beli:,.0f}")
         with col2:
             if total_profit_loss >= 0:
-                st.success(f"**Total Keuntungan**: Rp {total_profit_loss:,.0f}\n\n**Persentase**: {profit_loss_percentage:.2f}%")
+                st.success(f"**Total Untung**: Rp {total_profit_loss:,.0f}\n\n**Persentase**: {profit_loss_percentage:.2f}%")
             else:
                 st.error(f"**Total Rugi**: Rp {total_profit_loss:,.0f}\n\n**Persentase**: {profit_loss_percentage:.2f}%")
 
