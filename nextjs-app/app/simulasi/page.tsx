@@ -286,12 +286,16 @@ export default function SimulasiPage() {
                 label="Total Pembelian"
                 value={formatCurrency(totalStats.beli)}
                 valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                shrinkLongValue
+                singleLineValue
                 icon={<ShoppingCart className="h-4 w-4" />}
               />
               <StatBox
                 label="Total Penjualan"
                 value={formatCurrency(totalStats.jual)}
                 valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                shrinkLongValue
+                singleLineValue
                 icon={<HandCoins className="h-4 w-4" />}
               />
               <StatBox
@@ -301,6 +305,8 @@ export default function SimulasiPage() {
                 variant={totalStats.rugi >= 0 ? "success" : "error"}
                 trend={totalStats.rugi >= 0 ? "up" : "down"}
                 valueClassName="text-[clamp(0.92rem,1.5vw,1.16rem)] tabular-nums"
+                shrinkLongValue
+                singleLineValue
                 icon={
                   totalStats.rugi >= 0 ? (
                     <TrendingUp className="h-4 w-4" />

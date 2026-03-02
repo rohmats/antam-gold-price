@@ -11,6 +11,8 @@ interface StatBoxProps {
   trend?: "up" | "down" | "neutral";
   variant?: "default" | "success" | "error" | "info";
   valueClassName?: string;
+  shrinkLongValue?: boolean;
+  singleLineValue?: boolean;
 }
 
 const variantStyles = {
@@ -34,7 +36,18 @@ export function StatBox({
   trend = "neutral",
   variant = "default",
   valueClassName,
+  shrinkLongValue = false,
+  singleLineValue = false,
 }: StatBoxProps) {
+  const compactValue = value.replace(/\s+/g, "");
+  const autoSizeClass = !shrinkLongValue
+    ? ""
+    : compactValue.length >= 19
+      ? "text-[clamp(0.72rem,1.2vw,0.95rem)]"
+      : compactValue.length >= 15
+        ? "text-[clamp(0.82rem,1.35vw,1.05rem)]"
+        : "";
+
   return (
     <Card className="h-full gap-2 border-border/70 bg-card/80 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:py-5">
       <CardHeader className="gap-1 px-4 pb-0 sm:px-5">
@@ -49,7 +62,7 @@ export function StatBox({
       </CardHeader>
       <CardContent className="space-y-1.5 px-4 sm:px-5">
         <div
-          className={`w-full min-w-0 break-words text-[clamp(1.05rem,2.3vw,1.55rem)] font-bold leading-tight ${variantStyles[variant]} ${valueClassName ?? ""}`}
+          className={`w-full min-w-0 text-[clamp(1.05rem,2.3vw,1.55rem)] font-bold leading-tight tracking-tight ${variantStyles[variant]} ${singleLineValue ? "whitespace-nowrap" : "break-words"} ${autoSizeClass} ${valueClassName ?? ""}`}
         >
           {value}
         </div>
